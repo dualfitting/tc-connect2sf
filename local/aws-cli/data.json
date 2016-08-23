@@ -1,0 +1,23 @@
+{
+  "AppXpressConfig": [
+    {
+      "PutRequest": {
+        "Item": {
+          "Setting": {
+            "S": "salesforce"
+          },
+          "Environment": {
+            "S": "development"
+          },
+          "magicnumbers": {
+            "M": {
+              "dripcampaignid": {
+                "S": "7015800000051vU"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+version: '2'
+services:
+    dynamodb: 
+        image: "tray/dynamodb-local"
+        hostname: dynamodb
+        ports: 
+            - "7777:7777"
+        command: "-inMemory -port 7777"
+    awscli:
+        build: aws-cli
+        depends_on: 
+            - dynamodb
+    mock-identity:
+        build: mock-identity
+        ports: 
+            - "3001:3001"

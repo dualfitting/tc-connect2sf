@@ -1,0 +1,25 @@
+{
+  "logLevel": "LOG_LEVEL",
+  "rabbitmqURL": "RABBITMQ_URL",
+  "ownerId": "OWNER_ID",
+  "aws": {
+    "endpoint": "AWS_ENDPOINT",
+    "region": "AWS_REGION",
+    "accessKeyId": "AWS_ACCESS_KEY_ID",
+    "secretAccessKey": "AWS_SECRET_ACCESS_KEY"
+  },
+  "identityService": {
+    "url": "IDENTITY_SERVICE_URL",
+    "clientId": "IDENTITY_SERVICE_CLIENT_ID",
+    "clientSecret": "IDENTITY_SERVICE_CLIENT_SECRET"
+  },
+  "salesforce": {
+    "clientId": "SALESFORCE_CLIENT_ID",
+    "subject": "SALESFORCE_CLIENT_SUBJECT",
+    "audience": "SALESFORCE_CLIENT_AUDIENCE"
+  },
+  "queues": {
+    "projectCreated": "QUEUE_PROJECT_CREATED",
+    "projectLaunched": "QUEUE_PROJECT_LAUNCHED"
+  }
+}
