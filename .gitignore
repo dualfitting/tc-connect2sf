@@ -2,3 +2,17 @@ node_modules
 coverage
 config/local.json
 .idea
+
+# Environment configuration
+env.sh
+
+# Keys and certs
+config/dev-cert.pem
+config/dev-key.pem
+
+# Cloudformation config
+cloudformation
+
+# ECS yml
+deploy/tc-connect2sf.yml
+deploy/tc-connect2sf.yml.template

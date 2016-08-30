@@ -169,14 +169,16 @@ Coverage report doesn't work on Windows.
 Use following JSON for testing
 ```
 {
-  "id": 1,
-  "members": [
-    {
-      "userId": 40135978,
-      "role": "customer",
-      "isPrimary": true
+    "updated": {
+        "id": 1,
+        "members": [
+            {
+                "userId": 40135978,
+                "role": "customer",
+                "isPrimary": true
+            }
+        ]
     }
-  ]
 }
 ```
 
