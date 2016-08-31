@@ -16,3 +16,6 @@ cloudformation
 # ECS yml
 deploy/tc-connect2sf.yml
 deploy/tc-connect2sf.yml.template
+deploy/src
+deploy/config
+deploy/

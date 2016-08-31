@@ -24,7 +24,7 @@ process.once('SIGINT', () => {
  * @param {String} queue the queue name
  * @param {Function} fn the function handler
  */
-export function consume(channel, queue, routingKey, fn) {
+export function consume(channel, queue, fn) {
   channel.assertQueue(queue, { durable: true });
   channel.consume(queue, async (msg) => {
     if (!msg) {
@@ -42,10 +42,8 @@ export function consume(channel, queue, routingKey, fn) {
       return;
     }
     try {
-      if(routingKey == msg.routingKey) {
-        await fn(project);
-        channel.ack(msg);
-      }
+      await fn(project);
+      channel.ack(msg);
     } catch (e) {
       logger.logFullError(e, `Queue ${queue}`);
       if (e.shouldAck) {
@@ -63,8 +61,8 @@ export function consume(channel, queue, routingKey, fn) {
 async function start() {
   connection = await amqp.connect(config.rabbitmqURL);
   const channel = await connection.createConfirmChannel();
-  consume(channel, config.queues.projectCreatedQueue, config.queues.projectCreatedRoutingKey, ConsumerService.processProjectCreated);
-  consume(channel, config.queues.projectLaunchedQueue, config.queues.projectLaunchedRoutingKey, ConsumerService.processProjectUpdated);
+  consume(channel, config.queues.projectCreated, ConsumerService.processProjectCreated);
+  consume(channel, config.queues.projectLaunched, ConsumerService.processProjectUpdated);
 }
 
 if (!module.parent) {

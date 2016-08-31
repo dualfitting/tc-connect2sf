@@ -31,6 +31,7 @@ export function consume(channel, queue, fn) {
       return;
     }
     debug(`Consuming message in ${queue}\n${msg.content}`);
+    debug(msg);
     let project;
     try {
       project = JSON.parse(msg.content.toString());

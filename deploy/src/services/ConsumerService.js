@@ -82,10 +82,9 @@ class ConsumerService {
    * Handle created/launched project
    * @param {Object} projectEvent the project
    */
-  @logAndValidate(['project'], {project: projectSchema})
-  //@logAndValidate(['projectEvent'], {project: projectEventSchema})
-  async processProjectUpdated(project) {
-    //var project = projectEvent.updated;
+  @logAndValidate(['projectEvent'], {project: projectEventSchema})
+  async processProjectUpdated(projectEvent) {
+    var project = projectEvent.updated;
     const [
       campaignId,
       {accessToken, instanceUrl},
@@ -108,3 +107,4 @@ class ConsumerService {
 }
 
 export default new ConsumerService();
+

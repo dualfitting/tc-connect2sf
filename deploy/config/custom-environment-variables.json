@@ -20,9 +20,7 @@
     "audience": "SALESFORCE_CLIENT_AUDIENCE"
   },
   "queues": {
-    "projectCreatedQueue": "QUEUE_PROJECT_CREATED",
-    "projectCreatedRoutingKey": "ROUTING_KEY_PROJECT_CREATED",
-    "projectLaunchedQueue": "QUEUE_PROJECT_LAUNCHED",
-    "projectLaunchedRoutingKey": "ROUTING_KEY_PROJECT_LAUNCHED"
+    "projectCreated": "QUEUE_PROJECT_CREATED",
+    "projectLaunched": "QUEUE_PROJECT_LAUNCHED"
   }
 }
