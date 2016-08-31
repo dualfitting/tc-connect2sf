@@ -16,6 +16,10 @@ const leadSource = 'Connect';
 const company = 'Unknown';
 const duplicateRecordRegex = /Connect_Project_Id__c duplicates value on record/;
 
+const projectSchema = Joi.object().keys({
+    id: Joi.number().required(),
+    members: Joi.array().required()
+}).unknown(true);
 
 const projectEventSchema = Joi.object().keys({
     updated: Joi.object().keys({
@@ -30,9 +34,11 @@ class ConsumerService {
    * Handle a new created project
    * @param {Object} projectEvent the project event
    */
-  @logAndValidate(['projectEvent'], {projectEvent: projectEventSchema})
-  async processProjectCreated(projectEvent) {
-    var project = projectEvent.updated; 
+  @logAndValidate(['project'], {project: projectSchema})
+  //@logAndValidate(['projectEvent'], {projectEvent: projectEventSchema})
+  //async processProjectCreated(projectEvent) {
+  async processProjectCreated(project) {
+    // var project = projectEvent.updated;
     const member = _.find(project.members, {role: memberRole, isPrimary: true});
     if (!member) {
       throw new UnprocessableError('Cannot find primary customer');
@@ -76,9 +82,10 @@ class ConsumerService {
    * Handle created/launched project
    * @param {Object} projectEvent the project
    */
-  @logAndValidate(['projectEvent'], {project: projectEventSchema})
-  async processProjectUpdated(projectEvent) {
-    var project = projectEvent.updated;
+  @logAndValidate(['project'], {project: projectSchema})
+  //@logAndValidate(['projectEvent'], {project: projectEventSchema})
+  async processProjectUpdated(project) {
+    //var project = projectEvent.updated;
     const [
       campaignId,
       {accessToken, instanceUrl},
