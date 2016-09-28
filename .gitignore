@@ -1,21 +1,21 @@
-node_modules
-coverage
-config/local.json
-.idea
+consumer/node_modules
+consumer/coverage
+consumer/config/local.json
+consumer/.idea
 
 # Environment configuration
-env.sh
+consumer/env.sh
 
 # Keys and certs
-config/dev-cert.pem
-config/dev-key.pem
+consumer/config/dev-cert.pem
+consumer/config/dev-key.pem
 
 # Cloudformation config
-cloudformation
+consumer/cloudformation
 
 # ECS yml
-deploy/tc-connect2sf.yml
-deploy/tc-connect2sf.yml.template
-deploy/src
-deploy/config
-deploy/
+consumer/deploy/tc-connect2sf.yml
+consumer/deploy/tc-connect2sf.yml.template
+consumer/deploy/src
+consumer/deploy/config
+consumer/deploy/

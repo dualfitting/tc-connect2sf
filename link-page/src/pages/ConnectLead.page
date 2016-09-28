@@ -1,0 +1,6 @@
+<apex:page controller="ConnectLeadController" action="{!findLead}">
+  <!-- Begin Default Content REMOVE THIS -->
+
+  <apex:pageMessage rendered="{!NOT(ISNULL(connectLeadId ))}" summary="No lead was found matching connect project id: {!connectLeadId}" severity="warning" strength="3" />
+   <apex:pageMessage rendered="{!ISNULL(connectLeadId )}" summary="Connect Project Id was not provided" severity="warning" strength="3" />
+</apex:page>
