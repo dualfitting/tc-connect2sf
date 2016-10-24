@@ -17,5 +17,7 @@ consumer/cloudformation
 consumer/deploy/tc-connect2sf.yml
 consumer/deploy/src
 consumer/deploy/config
-consumer/deploy/
 consumer/deploy/*.env
+consumer/deploy/.babelrc
+consumer/deploy/.eslintignore
+consumer/deploy/.eslintrc
