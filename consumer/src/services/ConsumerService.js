@@ -14,7 +14,7 @@ import {UnprocessableError} from '../common/errors';
 const memberRole = 'customer';
 const leadSource = 'Connect';
 const company = 'Unknown';
-const duplicateRecordRegex = /Connect_Project_Id__c duplicates value on record/;
+const duplicateRecordRegex = /TC_Connect_Project_Id__c duplicates value on record/;
 
 const projectSchema = Joi.object().keys({
     id: Joi.number().required(),
@@ -53,7 +53,7 @@ class ConsumerService {
       LeadSource: leadSource,
       Company: company,
       OwnerId: config.ownerId,
-      Connect_Project_Id__c: project.id,
+      TC_Connect_Project_Id__c: project.id,
     };
     let leadId;
     try {
@@ -84,15 +84,15 @@ class ConsumerService {
       ConfigurationService.getSalesforceCampaignId(),
       SalesforceService.authenticate(),
     ]);
-    let sql = `SELECT id FROM Lead WHERE Connect_Project_Id__c = '${project.id}'`;
+    let sql = `SELECT id FROM Lead WHERE TC_Connect_Project_Id__c = '${project.id}'`;
     const {records: [lead]} = await SalesforceService.query(sql, accessToken, instanceUrl);
     if (!lead) {
-      throw new UnprocessableError(`Cannot find Lead with Connect_Project_Id__c = '${project.id}'`);
+      throw new UnprocessableError(`Cannot find Lead with TC_Connect_Project_Id__c = '${project.id}'`);
     }
     sql = `SELECT id FROM CampaignMember WHERE LeadId = '${lead.Id}' AND CampaignId ='${campaignId}'`;
     const {records: [member]} = await SalesforceService.query(sql, accessToken, instanceUrl);
     if (!member) {
-      throw new UnprocessableError(`Cannot find CampaignMember for Lead.Connect_Project_Id__c = '${project.id}'`);
+      throw new UnprocessableError(`Cannot find CampaignMember for Lead.TC_Connect_Project_Id__c = '${project.id}'`);
     }
     await SalesforceService.deleteObject('CampaignMember', member.Id, accessToken, instanceUrl);
   }

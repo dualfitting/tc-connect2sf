@@ -60,7 +60,7 @@ describe('ConsumerService', () => {
         LeadSource: 'Connect',
         Company: 'Unknown',
         OwnerId: config.ownerId,
-        Connect_Project_Id__c: 1,
+        TC_Connect_Project_Id__c: 1,
       };
 
       const expectedCampaignMember = {
@@ -92,7 +92,7 @@ describe('ConsumerService', () => {
       const createObjectStub = sandbox.stub(SalesforceService, 'createObject', async() => {
         const err = new Error('Bad request');
         err.response = {
-          text: '[{"message":"duplicate value found: Connect_Project_Id__c duplicates value on' +
+          text: '[{"message":"duplicate value found: TC_Connect_Project_Id__c duplicates value on' +
           ' record with id: 00Q58000003tW4u","errorCode":"DUPLICATE_VALUE","fields":[]}]',
         };
         throw err;
@@ -115,7 +115,7 @@ describe('ConsumerService', () => {
   describe('processProjectUpdated', () => {
     it('should process project successfully', async() => {
       const memberId = 'member-id';
-      const leadSql = `SELECT id FROM Lead WHERE Connect_Project_Id__c = '${project.id}'`;
+      const leadSql = `SELECT id FROM Lead WHERE TC_Connect_Project_Id__c = '${project.id}'`;
       const memberSql = `SELECT id FROM CampaignMember WHERE LeadId = '${leadId}' AND CampaignId ='${sfCampaignId}'`;
 
       const queryStub = sandbox.stub(SalesforceService, 'query');
@@ -137,7 +137,7 @@ describe('ConsumerService', () => {
       queryStub.onCall(0)
         .returns(Promise.resolve({ records: [] }));
       await expect(ConsumerService.processProjectUpdated(project))
-        .to.be.rejectedWith(UnprocessableError, /Cannot find Lead with Connect_Project_Id__c = '1'/);
+        .to.be.rejectedWith(UnprocessableError, /Cannot find Lead with TC_Connect_Project_Id__c = '1'/);
       queryStub.should.have.been.called;
     });
 
@@ -148,7 +148,7 @@ describe('ConsumerService', () => {
       queryStub.onCall(1)
         .returns(Promise.resolve({ records: [] }));
       await expect(ConsumerService.processProjectUpdated(project))
-        .to.be.rejectedWith(UnprocessableError, /Cannot find CampaignMember for Lead.Connect_Project_Id__c = '1'/);
+        .to.be.rejectedWith(UnprocessableError, /Cannot find CampaignMember for Lead.TC_Connect_Project_Id__c = '1'/);
       queryStub.should.have.been.called;
     });
   });

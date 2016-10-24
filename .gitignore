@@ -15,7 +15,7 @@ consumer/cloudformation
 
 # ECS yml
 consumer/deploy/tc-connect2sf.yml
-consumer/deploy/tc-connect2sf.yml.template
 consumer/deploy/src
 consumer/deploy/config
 consumer/deploy/
+consumer/deploy/*.env
