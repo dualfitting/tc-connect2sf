@@ -11,7 +11,10 @@ consumer/config/dev-cert.pem
 consumer/config/dev-key.pem
 
 # Cloudformation config
-consumer/cloudformation
+consumer/cloudformation/*
+!consumer/cloudformation/create-stack.sh
+!consumer/cloudformation/update-stack.sh
+!consumer/cloudformation/tc-connect2sf-ecs-cfn.json
 
 # ECS yml
 consumer/deploy/tc-connect2sf.yml
