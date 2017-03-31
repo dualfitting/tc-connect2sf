@@ -17,6 +17,6 @@ RUN npm install
 
 RUN npm install -g forever
 
-#EXPOSE 3000
+EXPOSE 80
 
 CMD forever start -c "npm start" --uid "consumer"  .
