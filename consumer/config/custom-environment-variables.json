@@ -19,8 +19,10 @@
     "subject": "SALESFORCE_CLIENT_SUBJECT",
     "audience": "SALESFORCE_CLIENT_AUDIENCE"
   },
-  "queues": {
-    "projectCreated": "QUEUE_PROJECT_CREATED",
-    "projectLaunched": "QUEUE_PROJECT_LAUNCHED"
+  "rabbitmq" : {
+    "projectsExchange" : "RABBITMQ_PROJECTS_EXCHANGE",
+    "queues": {
+      "project": "QUEUE_PROJECTS"
+    }
   }
 }

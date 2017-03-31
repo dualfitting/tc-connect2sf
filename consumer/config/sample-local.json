@@ -18,8 +18,10 @@
     "subject": "****UPDATE****",
     "audience": "https://login.salesforce.com"
   },
-  "queues": {
-    "projectCreated": "created",
-    "projectLaunched": "launched"
+  "rabbitmq" : {
+    "projectsExchange" : "dev.projects",
+    "queues": {
+      "project": "dev.project.service"
+    }
   }
 }

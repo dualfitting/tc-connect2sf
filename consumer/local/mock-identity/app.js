@@ -11,7 +11,7 @@ app.set('port', 3001);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.post('/v3/authorization', (req, res) => {
+app.post('/v3/authorizations', (req, res) => {
   res.json({
     "id": "-88f3803:1557f8485b0:-ae0",
     "result": {

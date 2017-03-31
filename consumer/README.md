@@ -167,17 +167,31 @@ Coverage report doesn't work on Windows.
 ## Verification
 
 Use following JSON for testing
+
+### Project Create
 ```
 {
+    "id": 1,
+    "members": [
+        {
+            "userId": 40135978,
+            "role": "customer",
+            "isPrimary": true
+        }
+    ]
+}
+```
+
+### Project Update
+```
+{
+    "original" : {
+        "id": 1,
+        "status": "in_review"
+    },
     "updated": {
         "id": 1,
-        "members": [
-            {
-                "userId": 40135978,
-                "role": "customer",
-                "isPrimary": true
-            }
-        ]
+        "status": "active"
     }
 }
 ```
