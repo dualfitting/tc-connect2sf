@@ -18,6 +18,8 @@ class IdentityService {
   @log([], {removeOutput: true})
   authenticate() {
     console.log('Authenticating to ' + config.identityService.url)
+    console.log('Client Id to ' + config.identityService.clientId)
+    console.log('Client Secret to ' + config.identityService.clientSecret)
     return request
       .post(`${config.identityService.url}/v3/authorizations`)
       .set('Content-Type', 'application/x-www-form-urlencoded') 
