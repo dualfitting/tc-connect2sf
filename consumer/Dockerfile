@@ -19,4 +19,6 @@ RUN npm install -g forever
 
 EXPOSE 80
 
-CMD forever start -c "npm start" --uid "consumer"  .
+#CMD forever start -c "npm start" --uid "consumer"  .
+
+CMD npm start
