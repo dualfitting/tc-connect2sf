@@ -56,11 +56,11 @@ Env variable: `OWNER_ID`
     - salesforce app digital certificate private key
     Env variable: `SALESFORCE_CLIENT_KEY`
 
-- **queues** contains configuration for rabbitmq queues
-    - **projectCreated** the queue for created projects  
-    Env variable: `QUEUE_PROJECT_CREATED`  
-    - **projectLaunched** the queue for launched projects  
-    Env variable: `QUEUE_PROJECT_LAUNCHED`
+- **rabbitmq** contains configuration for rabbitmq
+    - **queues** the queue for projects  
+    Env variable: `QUEUE_PROJECTS`  
+    - **projectsExchange** the rabbitmq exchange used to map sub queues
+    Env variable: `RABBITMQ_PROJECTS_EXCHANGE`
 
 To output debug information, set `DEBUG` env variable to `app:*`,
 
