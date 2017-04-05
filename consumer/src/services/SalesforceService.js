@@ -13,7 +13,6 @@ import {logAndValidate, log} from '../common/decorators';
 
 const loginBaseUrl = config.salesforce.audience || 'https://login.salesforce.com';
 const request = superagentPromise(superagent, Promise);
-// const privateKey = fs.readFileSync(path.join(__dirname, '../../config/' + (process.env.KEY_FILE_NAME || 'dev-key.pem')), 'utf8');
 let privateKey = process.env.SALESFORCE_CLIENT_KEY
 privateKey = privateKey.replace(/\\n/g, "\n")
 
