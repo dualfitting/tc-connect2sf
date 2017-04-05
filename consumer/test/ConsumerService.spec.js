@@ -8,6 +8,7 @@ import ConfigurationService from '../src/services/ConfigurationService';
 import SalesforceService from '../src/services/SalesforceService';
 import IdentityService from '../src/services/IdentityService';
 import {UnprocessableError} from '../src/common/errors';
+import logger from '../src/common/logger';
 import './setup';
 
 describe('ConsumerService', () => {
@@ -34,6 +35,16 @@ describe('ConsumerService', () => {
       },
     ],
   };
+  const projectUpdatePaylod = {
+    original: {
+      id: 1,
+      status: 'in_review'
+    },
+    updated: {
+      id: 1,
+      status: 'active'
+    }
+  }
   let sandbox;
   let getUserStub;
   let getCampaignIdStub;
@@ -70,7 +81,7 @@ describe('ConsumerService', () => {
 
       const createObjectStub = sandbox.stub(SalesforceService, 'createObject', async() => leadId);
 
-      await ConsumerService.processProjectCreated(project);
+      await ConsumerService.processProjectCreated(logger, project);
       getCampaignIdStub.should.have.been.called;
       getUserStub.should.have.been.calledWith(userId);
       authenticateStub.should.have.been.called;
@@ -84,7 +95,7 @@ describe('ConsumerService', () => {
         id: 1,
         members: [],
       };
-      await expect(ConsumerService.processProjectCreated(projectWihoutMembers))
+      await expect(ConsumerService.processProjectCreated(logger, projectWihoutMembers))
         .to.be.rejectedWith(UnprocessableError, /Cannot find primary customer/);
     });
 
@@ -97,7 +108,7 @@ describe('ConsumerService', () => {
         };
         throw err;
       });
-      await expect(ConsumerService.processProjectCreated(project))
+      await expect(ConsumerService.processProjectCreated(logger,project))
         .to.be.rejectedWith(UnprocessableError, /Lead already existing for project 1/);
       createObjectStub.should.have.been.called;
     });
@@ -106,7 +117,7 @@ describe('ConsumerService', () => {
       const createObjectStub = sandbox.stub(SalesforceService, 'createObject', async() => {
         throw new Error('Fake Error');
       });
-      await expect(ConsumerService.processProjectCreated(project))
+      await expect(ConsumerService.processProjectCreated(logger, project))
         .to.be.rejectedWith(Error, /Fake Error/);
       createObjectStub.should.have.been.called;
     });
@@ -125,7 +136,7 @@ describe('ConsumerService', () => {
         .returns(Promise.resolve({ records: [{ Id: memberId }] }));
       const deleteObjectStub = sandbox.stub(SalesforceService, 'deleteObject');
 
-      await ConsumerService.processProjectUpdated(project);
+      await ConsumerService.processProjectUpdated(logger, projectUpdatePaylod);
       queryStub.should.have.been.calledWith(leadSql, sfAuth.accessToken, sfAuth.instanceUrl);
       queryStub.should.have.been.calledWith(memberSql, sfAuth.accessToken, sfAuth.instanceUrl);
       deleteObjectStub.should.have.been.calledWith('CampaignMember', memberId, sfAuth.accessToken,
@@ -136,7 +147,7 @@ describe('ConsumerService', () => {
       const queryStub = sandbox.stub(SalesforceService, 'query');
       queryStub.onCall(0)
         .returns(Promise.resolve({ records: [] }));
-      await expect(ConsumerService.processProjectUpdated(project))
+      await expect(ConsumerService.processProjectUpdated(logger, projectUpdatePaylod))
         .to.be.rejectedWith(UnprocessableError, /Cannot find Lead with TC_Connect_Project_Id__c = '1'/);
       queryStub.should.have.been.called;
     });
@@ -147,7 +158,7 @@ describe('ConsumerService', () => {
         .returns(Promise.resolve({ records: [{ Id: leadId }] }));
       queryStub.onCall(1)
         .returns(Promise.resolve({ records: [] }));
-      await expect(ConsumerService.processProjectUpdated(project))
+      await expect(ConsumerService.processProjectUpdated(logger, projectUpdatePaylod))
         .to.be.rejectedWith(UnprocessableError, /Cannot find CampaignMember for Lead.TC_Connect_Project_Id__c = '1'/);
       queryStub.should.have.been.called;
     });

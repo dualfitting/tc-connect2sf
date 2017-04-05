@@ -3,6 +3,7 @@
  */
 
 import nock from 'nock';
+import config from 'config';
 import SalesforceService from '../src/services/SalesforceService';
 import './setup';
 
@@ -30,7 +31,7 @@ describe('SalesforceService', () => {
 
   describe('authenticate', () => {
     it('should return a token successfully', async() => {
-      const fakeHttp = nock('https://login.salesforce.com')
+      const fakeHttp = nock(config.salesforce.audience)
         .post('/services/oauth2/token')
         .reply(200, authenticateResponse);
       const result = await SalesforceService.authenticate();

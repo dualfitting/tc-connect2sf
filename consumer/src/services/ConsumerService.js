@@ -91,7 +91,6 @@ class ConsumerService {
   async processProjectUpdated(logger, projectEvent) {
     logger.debug(projectEvent)
     var project = projectEvent.original;
-    console.log(project)
     const [
       campaignId,
       {accessToken, instanceUrl},

@@ -20,9 +20,13 @@ process.once('SIGINT', () => {
   process.exit();
 });
 
-const handlers = {
+let EVENT_HANDLERS = {
   [EVENT.ROUTING_KEY.PROJECT_DRAFT_CREATED]: ConsumerService.processProjectCreated,
   [EVENT.ROUTING_KEY.PROJECT_UPDATED]: ConsumerService.processProjectUpdated
+}
+
+export function initHandlers(handlers) {
+  EVENT_HANDLERS = handlers;
 }
 
 /**
@@ -32,16 +36,9 @@ const handlers = {
  * @param {String} queue the queue name
  */
 export async function consume(channel, exchangeName, queue) {
-  console.log(exchangeName)
-  console.log(queue)
   channel.assertExchange(exchangeName, 'topic', { durable: true });
-  // channel.assertQueue(queue, { durable: true })
-  // .then((q) => console.log(q))
-  // .catch((e) => console.log(e))
   channel.assertQueue(queue, { durable: true });
-  const bindings = _.keys(handlers);
-  debug('Adding bindings: ', bindings);
-  console.log(bindings);
+  const bindings = _.keys(EVENT_HANDLERS);
   const bindingPromises = _.map(bindings, rk =>
     channel.bindQueue(queue, exchangeName, rk));
   return Promise.all(bindingPromises).then(() => {
@@ -50,28 +47,18 @@ export async function consume(channel, exchangeName, queue) {
         return;
       }
       debug(`Consuming message in ${queue}\n${msg.content}`);
-      debug(`Original request Id = ${msg.properties.correlationId}`)
-      // debug(msg);
-      const key = msg.fields.routingKey;
-      debug(key)
-      // create a child logger so we can trace with original request id
-      // const cLogger = logger.child({
-      //   requestId: msg.properties.correlationId,
-      // });
-      // cLogger.debug('Received Message', key, msg.fields);
+      const key = _.get(msg, 'fields.routingKey');
       debug('Received Message', key, msg.fields);
 
       let handler;
       let data;
       try {
-        handler = handlers[key];
-        console.log(handler);
+        handler = EVENT_HANDLERS[key];
         if (!_.isFunction(handler)) {
           logger.error(`Unknown message type: ${key}, NACKing... `);
           channel.nack(msg, false, false)
         }
         data = JSON.parse(msg.content.toString());
-        console.log(data)
       } catch (ignore) {
         logger.info(ignore);
         logger.error('Invalid message. Ignoring');
@@ -97,11 +84,10 @@ export async function consume(channel, exchangeName, queue) {
  * Start the worker
  */
 async function start() {
-  console.log(config.rabbitmqURL);
   connection = await amqp.connect(config.rabbitmqURL);
-  console.log('created connection successfully with URL: ' + config.rabbitmqURL);
+  debug('created connection successfully with URL: ' + config.rabbitmqURL);
   const channel = await connection.createConfirmChannel();
-  console.log('Channel confirmed...');
+  debug('Channel confirmed...');
   consume(channel, config.rabbitmq.projectsExchange, config.rabbitmq.queues.project);
 }
 
