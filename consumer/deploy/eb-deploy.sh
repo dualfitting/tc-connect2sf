@@ -8,8 +8,8 @@ TAG="$ENV.$TAG_SUFFIX"
 
 echo "Deploying to Elasticbeanstalk"
 echo "############################"
-export AWS_ACCESS_KEY_ID=$(eval "echo \$${ENV}_AWS_ACCESS_KEY_ID")
-export AWS_SECRET_ACCESS_KEY=$(eval "echo \$${ENV}_AWS_SECRET_ACCESS_KEY")
+export AWS_ACCESS_KEY_ID=$(eval "echo \$$AWS_ACCESS_KEY_ID")
+export AWS_SECRET_ACCESS_KEY=$(eval "echo \$$AWS_SECRET_ACCESS_KEY")
 
 # eb deploy
 eb init -r us-east-1 $SERVICE
