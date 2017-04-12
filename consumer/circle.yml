@@ -12,7 +12,7 @@ test:
 
 deployment:
   development:
-    branch: ["dev", "circleci"]
+    branch: ["dev", "circleci", "test"]
     commands:
       - eb use tc-salesforce-dev2
       - eb deploy
