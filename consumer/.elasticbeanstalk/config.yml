@@ -4,10 +4,10 @@ branch-defaults:
     group_suffix: null
   dev:
     ec2_keyname: topcoder-dev-vpc-app
-    environment: tc-salesforce-dev2
+    environment: tc-connect2sf-dev
     group_suffix: null
 environment-defaults:
-  tc-salesforce-dev2:
+  tc-connect2sf-dev:
     branch: dev
     repository: null
 global:
