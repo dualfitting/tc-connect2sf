@@ -4,6 +4,7 @@ SERVICE=$1
 ENV=$2
 TAG_SUFFIX=$3
 TAG="$ENV.$TAG_SUFFIX"
+ENV_LOWER=`echo "$ENV" | awk '{print tolower($0)}'`
 
 
 echo "Deploying to Elasticbeanstalk"
