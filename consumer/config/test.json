@@ -1,0 +1,27 @@
+{
+  "logLevel": "error",
+  "rabbitmqURL": "  amqp://ybevimhe:Jat3glhmz77Mwgj9-BdPeesECIH5MQUQ@fox.rmq.cloudamqp.com/ybevimhe",
+  "ownerId": "005110000056Cq7",
+  "aws": {
+    "endpoint": "http://localhost:7777",
+    "region": "us-east-1",
+    "accessKeyId": "FAKE_ACCESS_KEY",
+    "secretAccessKey": "FAKE_SECRET_ACCESS_KEY"
+  },
+  "identityService": {
+    "url": "http://localhost:3001",
+    "clientId": "FAKE_CLIENT_ID",
+    "clientSecret": "FAKE_CLIENT_SECRET"
+  },
+  "salesforce": {
+    "clientId": "3MVG98RqVesxRgQ7L6q75I2yy1gOSB231UCKLlh_cY.7UklXFjlYscm6Dwt2Ji4s7m4H5XoKFy39y1ZDRsKMz",
+    "subject": "vikas.agarwal1@topcoder.com.dev",
+    "audience": "https://test.salesforce.com"
+  },
+  "rabbitmq" : {
+    "projectsExchange" : "dev.projects",
+    "queues": {
+      "project": "dev.project.service"
+    }
+  }
+}
