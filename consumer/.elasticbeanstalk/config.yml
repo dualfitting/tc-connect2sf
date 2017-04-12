@@ -1,0 +1,23 @@
+branch-defaults:
+  default:
+    environment: null
+    group_suffix: null
+  dev:
+    ec2_keyname: topcoder-dev-vpc-app
+    environment: tc-salesforce-dev2
+    group_suffix: null
+environment-defaults:
+  tc-salesforce-dev2:
+    branch: dev
+    repository: null
+global:
+  application_name: tc-salesforce
+  default_ec2_keyname: topcoder-dev-vpc-app
+  default_platform: Node.js
+  default_region: us-east-1
+  instance_profile: null
+  platform_name: null
+  platform_version: null
+  profile: eb-cli
+  sc: git
+  workspace_type: Application
