@@ -54,7 +54,7 @@ class ConsumerService {
       IdentityService.getUser(member.userId, token),
       SalesforceService.authenticate(),
     ])
-    .then(function(responses) {
+    .then(async function(responses) {
       const campaignId = responses[0];
       const user = responses[1];
       const { accessToken, instanceUrl } = responses[3];
