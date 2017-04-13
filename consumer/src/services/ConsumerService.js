@@ -48,39 +48,43 @@ class ConsumerService {
     if (!member) {
       throw new UnprocessableError('Cannot find primary customer');
     }
-    const [
-      campaignId,
-      user,
-      {accessToken, instanceUrl},
-    ] = await Promise.all([
+    const token = await IdentityService.authenticate();
+    return Promise.all([
       ConfigurationService.getSalesforceCampaignId(),
-      IdentityService.getUser(member.userId),
+      IdentityService.getUser(member.userId, token),
       SalesforceService.authenticate(),
-    ]);
-
-    const lead = {
-      FirstName: user.firstName,
-      LastName: user.lastName,
-      Email: user.email,
-      LeadSource: leadSource,
-      Company: company,
-      OwnerId: config.ownerId,
-      TC_Connect_Project_Id__c: project.id,
-    };
-    let leadId;
-    try {
-      leadId = await SalesforceService.createObject('Lead', lead, accessToken, instanceUrl);
-    } catch (e) {
-      if (e.response && e.response.text && duplicateRecordRegex.test(e.response.text)) {
-        throw new UnprocessableError(`Lead already existing for project ${project.id}`);
+    ])
+    .then(function(responses) {
+      const campaignId = responses[0];
+      const user = responses[1];
+      const { accessToken, instanceUrl } = responses[3];
+      const lead = {
+        FirstName: user.firstName,
+        LastName: user.lastName,
+        Email: user.email,
+        LeadSource: leadSource,
+        Company: company,
+        OwnerId: config.ownerId,
+        TC_Connect_Project_Id__c: project.id,
+      };
+      let leadId;
+      try {
+        leadId = await SalesforceService.createObject('Lead', lead, accessToken, instanceUrl);
+      } catch (e) {
+        if (e.response && e.response.text && duplicateRecordRegex.test(e.response.text)) {
+          throw new UnprocessableError(`Lead already existing for project ${project.id}`);
+        }
+        throw e;
       }
-      throw e;
-    }
-    const campaignMember = {
-      LeadId: leadId,
-      CampaignId: campaignId,
-    };
-    await SalesforceService.createObject('CampaignMember', campaignMember, accessToken, instanceUrl);
+      const campaignMember = {
+        LeadId: leadId,
+        CampaignId: campaignId,
+      };
+      await SalesforceService.createObject('CampaignMember', campaignMember, accessToken, instanceUrl);
+    })
+    .catch(function(error) {
+      throw error;
+    });
   }
 
   /**
