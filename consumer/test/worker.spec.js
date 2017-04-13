@@ -1,26 +1,42 @@
 /**
  * Unit tests for worker
  */
-
-import {consume} from '../src/worker';
+import {consume, initHandlers} from '../src/worker';
 import {UnprocessableError} from '../src/common/errors';
+import { EVENT } from '../config/constants';
 import './setup';
 
 describe('worker', () => {
   describe('consume', () => {
     const queueName = 'sample-queue';
-    const validMessage = { content: JSON.stringify({ sampleData: 'foo' }) };
+    const exchangeName = EVENT.ROUTING_KEY.PROJECT_DRAFT_CREATED//'sample-exchange';
+    const validMessage = {
+      content: JSON.stringify({ sampleData: 'foo' }),
+      properties: { correlationId : 'unit-tests'},
+      fields: { routingKey: exchangeName }
+    };
     let handler;
     let ack;
     let nack;
     let assertQueue;
+    let assertExchange;
+    let bindQueue;
     let rabbitConsume;
+    let exchangeHandlerSpy = sinon.spy();
+    let fakeExchangeHandlerSpy = sinon.spy();
 
     beforeEach(() => {
       handler = sinon.spy();
       ack = sinon.spy();
       nack = sinon.spy();
       assertQueue = sinon.spy();
+      assertExchange = sinon.spy();
+      bindQueue = sinon.spy();
+
+      initHandlers({
+        [exchangeName] : exchangeHandlerSpy,
+        'fakeExchange' : fakeExchangeHandlerSpy
+      })
     });
 
     /**
@@ -31,6 +47,8 @@ describe('worker', () => {
       consume({
         ack,
         nack,
+        assertExchange,
+        bindQueue,
         assertQueue,
         consume: async (queue, fn) => {
           try {
@@ -40,7 +58,7 @@ describe('worker', () => {
             done(e);
           }
         },
-      }, queueName, handler);
+      }, exchangeName, queueName);
     }
 
     it('should consume and ack a message successfully', (done) => {
@@ -48,7 +66,8 @@ describe('worker', () => {
         expect(queue).to.equal(queueName);
         await fn(validMessage);
         assertQueue.should.have.been.calledWith(queueName, { durable: true });
-        handler.should.have.been.calledWith({ sampleData: 'foo' });
+        exchangeHandlerSpy.should.have.been.calledWith(sinon.match.any, { sampleData: 'foo' });
+        fakeExchangeHandlerSpy.should.not.have.been.called;
         ack.should.have.been.calledWith(validMessage);
       };
       invokeConsume(done);
@@ -73,9 +92,11 @@ describe('worker', () => {
     });
 
     it('should nack if error is thrown', (done) => {
-      handler = () => {
-        throw new Error('foo');
-      };
+      initHandlers({
+        [exchangeName] : () => {
+          throw new Error('foo');
+        }
+      })
       rabbitConsume = async (queue, fn) => {
         await fn(validMessage);
         nack.should.have.been.calledWith(validMessage);

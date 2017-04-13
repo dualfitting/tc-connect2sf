@@ -20,7 +20,7 @@ class IdentityService {
     return request
       .post(`${config.identityService.url}/v3/authorizations`)
       .set('Content-Type', 'application/x-www-form-urlencoded') 
-      .send('clientId=' + config.identityService.clientId + '&secret=' + config.identityService.clientSecret)
+      .send('clientId=' + config.identityService.clientId + '&secret=' + encodeURIComponent(config.identityService.clientSecret))
       .end()
       .then((res) => { 
             var response = JSON.parse(res.text);

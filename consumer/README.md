@@ -53,12 +53,14 @@ Env variable: `OWNER_ID`
     Env variable: `SALESFORCE_CLIENT_SUBJECT`
     - **audience** the salesforce login url  
     Env variable: `SALESFORCE_CLIENT_AUDIENCE`
+    - salesforce app digital certificate private key
+    Env variable: `SALESFORCE_CLIENT_KEY`
 
-- **queues** contains configuration for rabbitmq queues
-    - **projectCreated** the queue for created projects  
-    Env variable: `QUEUE_PROJECT_CREATED`  
-    - **projectLaunched** the queue for launched projects  
-    Env variable: `QUEUE_PROJECT_LAUNCHED`
+- **rabbitmq** contains configuration for rabbitmq
+    - **queues** the queue for projects  
+    Env variable: `QUEUE_PROJECTS`  
+    - **projectsExchange** the rabbitmq exchange used to map sub queues
+    Env variable: `RABBITMQ_PROJECTS_EXCHANGE`
 
 To output debug information, set `DEBUG` env variable to `app:*`,
 
@@ -83,6 +85,8 @@ All steps are for old theme.
 You can use the existing cert.pem from `config` directory.  
 Or generate a new certificate and key using a command:  
 `openssl req -newkey rsa:2048 -new -nodes -x509 -days 3650 -keyout key.pem -out cert.pem`
+
+Private key of your certificate is read from environment variable, instead of reading from the config directory. So please make sure you replace all new line characters with `\n` before setting it in the environment variable. Application would add newline characters back to the key when using it to sign the requests.
 
 ![Alt text](https://monosnap.com/file/tT9ZZXUH1aa1j7cFzYxaV9RjmHWCum.png)
 Click Save  
@@ -167,17 +171,31 @@ Coverage report doesn't work on Windows.
 ## Verification
 
 Use following JSON for testing
+
+### Project Create
 ```
 {
+    "id": 1,
+    "members": [
+        {
+            "userId": 40135978,
+            "role": "customer",
+            "isPrimary": true
+        }
+    ]
+}
+```
+
+### Project Update
+```
+{
+    "original" : {
+        "id": 1,
+        "status": "in_review"
+    },
     "updated": {
         "id": 1,
-        "members": [
-            {
-                "userId": 40135978,
-                "role": "customer",
-                "isPrimary": true
-            }
-        ]
+        "status": "active"
     }
 }
 ```

@@ -1,22 +1,22 @@
 {
   "logLevel": "error",
-  "rabbitmqURL": "****UPDATE****",
-  "ownerId": "****UPDATE****",
+  "rabbitmqURL": "FAKE_RABBITMQ_URL",
+  "ownerId": "005110000056Cq7",
   "aws": {
-    "endpoint": "http://dockerhost:7777",
+    "endpoint": "http://localhost:7777",
     "region": "us-east-1",
     "accessKeyId": "FAKE_ACCESS_KEY",
     "secretAccessKey": "FAKE_SECRET_ACCESS_KEY"
   },
   "identityService": {
-    "url": "http://dockerhost:3001",
+    "url": "http://localhost:3001",
     "clientId": "FAKE_CLIENT_ID",
     "clientSecret": "FAKE_CLIENT_SECRET"
   },
   "salesforce": {
-    "clientId": "****UPDATE****",
-    "subject": "****UPDATE****",
-    "audience": "https://login.salesforce.com"
+    "clientId": "FAKE_SALESFORCE_CLIENT_ID",
+    "subject": "vikas.agarwal1@topcoder.com.dev",
+    "audience": "https://test.salesforce.com"
   },
   "rabbitmq" : {
     "projectsExchange" : "dev.projects",

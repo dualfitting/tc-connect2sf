@@ -16,9 +16,22 @@ const leadSource = 'Connect';
 const company = 'Unknown';
 const duplicateRecordRegex = /TC_Connect_Project_Id__c duplicates value on record/;
 
-const projectSchema = Joi.object().keys({
-    id: Joi.number().required(),
-    members: Joi.array().required()
+const projectCreatedSchema = Joi.object().keys({
+    logger: Joi.object(),
+    project: Joi.object().keys({
+      id: Joi.number().required(),
+      members: Joi.array().required()
+    }).unknown(true)
+}).unknown(true);
+
+const projectUpdatedSchema = Joi.object().keys({
+    logger: Joi.object(),
+    projectEvent: Joi.object().keys({
+      original: Joi.object().keys({
+        id: Joi.number().required()
+      }).required().unknown(true),
+      updated: Joi.object().required()
+    }).required()
 }).unknown(true);
 
 class ConsumerService {
@@ -27,11 +40,10 @@ class ConsumerService {
    * Handle a new created project
    * @param {Object} projectEvent the project event
    */
-  @logAndValidate(['project'], {project: projectSchema})
+  @logAndValidate(['logger','project'], projectCreatedSchema)
   //@logAndValidate(['projectEvent'], {projectEvent: projectEventSchema})
   //async processProjectCreated(projectEvent) {
-  async processProjectCreated(project) {
-    // var project = projectEvent.updated;
+  async processProjectCreated(logger, project) {
     const member = _.find(project.members, {role: memberRole, isPrimary: true});
     if (!member) {
       throw new UnprocessableError('Cannot find primary customer');
@@ -75,8 +87,10 @@ class ConsumerService {
    * Handle created/launched project
    * @param {Object} projectEvent the project
    */
-  @logAndValidate(['project'], {project: projectSchema})
-  async processProjectUpdated(project) {
+  @logAndValidate(['logger', 'projectEvent'], projectUpdatedSchema)
+  async processProjectUpdated(logger, projectEvent) {
+    logger.debug(projectEvent)
+    var project = projectEvent.original;
     const [
       campaignId,
       {accessToken, instanceUrl},
