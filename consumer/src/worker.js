@@ -84,11 +84,15 @@ export async function consume(channel, exchangeName, queue) {
  * Start the worker
  */
 async function start() {
-  connection = await amqp.connect(config.rabbitmqURL);
-  debug('created connection successfully with URL: ' + config.rabbitmqURL);
-  const channel = await connection.createConfirmChannel();
-  debug('Channel confirmed...');
-  consume(channel, config.rabbitmq.projectsExchange, config.rabbitmq.queues.project);
+  try {
+    connection = await amqp.connect(config.rabbitmqURL);
+    debug('created connection successfully with URL: ' + config.rabbitmqURL);
+    const channel = await connection.createConfirmChannel();
+    debug('Channel confirmed...');
+    consume(channel, config.rabbitmq.projectsExchange, config.rabbitmq.queues.project);
+  } catch (e) {
+    debug('Unable to connect to RabbitMQ')
+  }
 }
 
 if (!module.parent) {
