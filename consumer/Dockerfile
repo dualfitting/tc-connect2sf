@@ -15,10 +15,6 @@ COPY . /usr/src/app
 # Install app dependencies
 RUN npm install
 
-RUN npm install -g forever
-
 EXPOSE 80
-
-#CMD forever start -c "npm start" --uid "consumer"  .
 
 CMD npm start
