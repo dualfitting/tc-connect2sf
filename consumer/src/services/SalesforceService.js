@@ -13,7 +13,8 @@ import {logAndValidate, log} from '../common/decorators';
 
 const loginBaseUrl = config.salesforce.audience || 'https://login.salesforce.com';
 const request = superagentPromise(superagent, Promise);
-let privateKey = process.env.SALESFORCE_CLIENT_KEY
+// we are using dummy private key to fail safe when key is not provided in env
+let privateKey = process.env.SALESFORCE_CLIENT_KEY || 'privateKey'
 privateKey = privateKey.replace(/\\n/g, "\n")
 
 const createObjectSchema = {
