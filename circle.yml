@@ -21,5 +21,4 @@ deployment:
   production:
     branch: master
     commands:
-      - eb use tc-connect2sf-prod
-      - eb deploy
+      - ./deploy/eb-deploy.sh tc-connect2sf PROD $CIRCLE_BUILD_NUM
