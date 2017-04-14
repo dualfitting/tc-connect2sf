@@ -71,10 +71,10 @@ export async function consume(channel, exchangeName, queue) {
       } catch (e) {
         logger.logFullError(e, `Queue ${queue}`);
         if (e.shouldAck) {
-          // nacking for debugging issue on production. this would prevent log pile up
-          channel.nack(msg);
+          channel.ack(msg);
         } else {
-          channel.nack(msg);
+          // acking for debugging issue on production. this would prevent log pile up
+          channel.ack(msg);
         }
       }
     });
