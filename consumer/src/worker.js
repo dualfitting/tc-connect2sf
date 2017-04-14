@@ -71,7 +71,8 @@ export async function consume(channel, exchangeName, queue) {
       } catch (e) {
         logger.logFullError(e, `Queue ${queue}`);
         if (e.shouldAck) {
-          channel.ack(msg);
+          // nacking for debugging issue on production. this would prevent log pile up
+          channel.nack(msg);
         } else {
           channel.nack(msg);
         }
