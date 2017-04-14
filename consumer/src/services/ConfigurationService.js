@@ -24,6 +24,7 @@ class ConfigurationService {
         },
       },
     }).promise();
+    console.log('items: ' + items);
     if (!items.length) {
       throw new Error('Configuration for AppXpressConfig not found');
     }
