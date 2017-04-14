@@ -15,7 +15,7 @@ class ConfigurationService {
    */
   @log()
   async getSalesforceCampaignId() {
-    const { Items: items } = await dynamodb.scan({
+    const result = await dynamodb.scan({
       TableName: dynamoTable,
       ScanFilter: {
         Environment: {
@@ -24,11 +24,12 @@ class ConfigurationService {
         },
       },
     }).promise();
-    console.log('items: ' + items);
-    if (!items.length) {
+    console.log('node env: ' + process.env.NODE_ENV);
+    console.log('items: ' + result);
+    if (!result.Items.length) {
       throw new Error('Configuration for AppXpressConfig not found');
     }
-    const item = items[0];
+    const item = result.Items[0];
     try {
       return item.magicnumbers.M.dripcampaignid.S;
     } catch (e) {

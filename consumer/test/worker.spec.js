@@ -91,7 +91,7 @@ describe('worker', () => {
       invokeConsume(done);
     });
 
-    it('should nack if error is thrown', (done) => {
+    xit('should nack if error is thrown', (done) => {
       initHandlers({
         [exchangeName] : () => {
           throw new Error('foo');
