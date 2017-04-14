@@ -20,10 +20,7 @@
       }
     },
     "start": {
-      "command": "babel-node src/worker",
-      "env": {
-        "NODE_ENV": "development"
-      }
+      "command": "babel-node src/worker"
     },
     "test": {
       "command": "mocha --compilers js:babel-register test/*.spec.js",
