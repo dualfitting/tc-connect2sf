@@ -35,7 +35,7 @@ export function initHandlers(handlers) {
  * @param {String} exchangeName the exchange name
  * @param {String} queue the queue name
  */
-export async function consume(channel, exchangeName, queue) {
+export async function consume(channel, exchangeName, queue, publishChannel) {
   channel.assertExchange(exchangeName, 'topic', { durable: true });
   channel.assertQueue(queue, { durable: true });
   const bindings = _.keys(EVENT_HANDLERS);
@@ -73,8 +73,16 @@ export async function consume(channel, exchangeName, queue) {
         if (e.shouldAck) {
           channel.ack(msg);
         } else {
-          // acking for debugging issue on production. this would prevent log pile up
+          // ack the message but copy it to other queue where no consumer is listening
+          // we can listen to that queue on adhoc basis when we see error case like lead not created in SF
+          // we can use cloudamqp console to check the messages and may be manually create SF lead
+          // nacking here was causing flood of messages to the worker and it keep on consuming high resources
           channel.ack(msg);
+          publishChannel.publish(
+            exchangeName,
+            EVENT.ROUTING_KEY.CONNECT_TO_SF_FAILED,
+            new Buffer(msg.content.toString())
+          );
         }
       }
     });
@@ -91,7 +99,13 @@ async function start() {
     debug('created connection successfully with URL: ' + config.rabbitmqURL);
     const channel = await connection.createConfirmChannel();
     debug('Channel confirmed...');
-    consume(channel, config.rabbitmq.projectsExchange, config.rabbitmq.queues.project);
+    const publishChannel = await connection.createConfirmChannel();
+    consume(
+      channel,
+      config.rabbitmq.projectsExchange,
+      config.rabbitmq.queues.project,
+      publishChannel
+    );
   } catch (e) {
     debug('Unable to connect to RabbitMQ');
   }

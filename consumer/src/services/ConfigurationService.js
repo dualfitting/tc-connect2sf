@@ -24,7 +24,6 @@ class ConfigurationService {
         },
       },
     }).promise();
-    console.log('node env: ' + process.env.NODE_ENV);
     if (!result.Items.length) {
       throw new Error('Configuration for AppXpressConfig not found');
     }
