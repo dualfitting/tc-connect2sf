@@ -61,7 +61,8 @@ describe('worker', () => {
         },
       }, exchangeName, queueName,
       {
-        publish: channelPublishSpy
+        publish: channelPublishSpy,
+        assertExchange
       });
     }
 
