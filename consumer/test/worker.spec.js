@@ -9,7 +9,7 @@ import './setup';
 describe('worker', () => {
   describe('consume', () => {
     const queueName = 'sample-queue';
-    const exchangeName = EVENT.ROUTING_KEY.PROJECT_DRAFT_CREATED//'sample-exchange';
+    const exchangeName = 'sample-exchange';
     const validMessage = {
       content: JSON.stringify({ sampleData: 'foo' }),
       properties: { correlationId : 'unit-tests'},
@@ -24,6 +24,7 @@ describe('worker', () => {
     let rabbitConsume;
     let exchangeHandlerSpy = sinon.spy();
     let fakeExchangeHandlerSpy = sinon.spy();
+    let channelPublishSpy = sinon.spy();
 
     beforeEach(() => {
       handler = sinon.spy();
@@ -58,7 +59,11 @@ describe('worker', () => {
             done(e);
           }
         },
-      }, exchangeName, queueName);
+      }, exchangeName, queueName,
+      {
+        publish: channelPublishSpy,
+        assertExchange
+      });
     }
 
     it('should consume and ack a message successfully', (done) => {
@@ -91,7 +96,7 @@ describe('worker', () => {
       invokeConsume(done);
     });
 
-    xit('should nack if error is thrown', (done) => {
+    it('should ack, with message being copied to temp queue, if error is thrown', (done) => {
       initHandlers({
         [exchangeName] : () => {
           throw new Error('foo');
@@ -99,7 +104,8 @@ describe('worker', () => {
       })
       rabbitConsume = async (queue, fn) => {
         await fn(validMessage);
-        nack.should.have.been.calledWith(validMessage);
+        ack.should.have.been.calledWith(validMessage);
+        channelPublishSpy.should.have.been.calledWith(exchangeName, EVENT.ROUTING_KEY.CONNECT_TO_SF_FAILED, new Buffer(validMessage.content));
       };
       invokeConsume(done);
     });
