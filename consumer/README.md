@@ -20,7 +20,7 @@ Env variable: `LOG_LEVEL`
 - **rabbitmqURL**
 The rabbitmq URL.  
 Create a free account here https://www.cloudamqp.com/ and create a new instance in any region.   
-You can get URL by clicking on queue details button.     
+You can get URL by clicking on queue details button. For deployment in AWS, please make sure that this instance is launched in the VPC which target AWS server can communicate with.
 Env variable: `RABBITMQ_URL`
 
 - **ownerId**
@@ -86,7 +86,7 @@ You can use the existing cert.pem from `config` directory.
 Or generate a new certificate and key using a command:  
 `openssl req -newkey rsa:2048 -new -nodes -x509 -days 3650 -keyout key.pem -out cert.pem`
 
-Private key of your certificate is read from environment variable, instead of reading from the config directory. So please make sure you replace all new line characters with `\n` before setting it in the environment variable. Application would add newline characters back to the key when using it to sign the requests.
+**Private key of your certificate is read from environment variable, instead of reading from the config directory. So please make sure you replace all new line characters with `\n` before setting it in the environment variable. Application would add newline characters back to the key when using it to sign the requests.**
 
 ![Alt text](https://monosnap.com/file/tT9ZZXUH1aa1j7cFzYxaV9RjmHWCum.png)
 Click Save  
@@ -224,11 +224,19 @@ Check the Lead details in Saleforce
 ![Alt text](https://monosnap.com/file/PdMF97k18cBGeZjR9qOkkBe1AjYw2n.png)
 Lead is removed from the campaign
 
+## Deployment Checklist
+1. AppXpressConfig table exists in dynamodb with dripcampaignId
+2. Make sure configured rabbitmq exchange and queue are created appropriately in cloumamqp
+3. There should be proper mapping between exchange and queue specified in the conifguration
+4. Grant permission, with user conifgured, for the app once using url https://login.salesforce.com/services/oauth2/authorize?client_id=[clientId]&redirect_uri=https://login.salesforce.com&response_type=code
 
-Notes on Error Handling.  
-UnprocessableError is thrown if operation cannot be completed.  
+## CI
+* All changes into dev will be built and deployed to AWS beanstalk environment `tc-connect2sf-dev`
+* All changes into master will be built and deployed to AWS beanstalk environment `tc-connect2sf-prod`
+
+## Notes on Error Handling.  
+`UnprocessableError` is thrown if operation cannot be completed.  
 For example: duplicated project id added to the queue, Lead cannot be found etc.  
 In such situation, the message from rabbitmq will be marked as ACK (removed).  
-If we won't remove it from queue, the message will be stuck forever.  
-
-
+If we won't remove it from queue, the message will be stuck forever.
+For any other type of error the message from the rabbitmq will me marked as ACK as well, however, it would requeued into another queue for later inspection. It right now publishes the message content to the same rabbitmq exchange (configured as mentioned in Configuration section) with routing key being `connect2sf.failed`. So, we have to map the exchange and routing key comibation to a queue to which no consumer is listeting e.g. `tc-connect2sf.failed` is used in dev environment. Now we can see messages, via rabbitmq manager UI, in this queue to check if any of the messages failed and what was id of the project which failed. We can either remove those messages from the queue, if we are going to add those leads manually in saleforce or move them again to the original queue after fixing the deployed environment.
