@@ -4,6 +4,7 @@
 import {consume, initHandlers} from '../src/worker';
 import {UnprocessableError} from '../src/common/errors';
 import { EVENT } from '../config/constants';
+import config from 'config';
 import './setup';
 
 describe('worker', () => {
@@ -105,8 +106,9 @@ describe('worker', () => {
       rabbitConsume = async (queue, fn) => {
         await fn(validMessage);
         ack.should.have.been.calledWith(validMessage);
+        const connect2sfExchange = config.rabbitmq.connect2sfExchange;
         const failedRoutingKey = validMessage.fields.routingKey + EVENT.ROUTING_KEY.FAILED_SUFFIX;
-        channelPublishSpy.should.have.been.calledWith(exchangeName, failedRoutingKey, new Buffer(validMessage.content));
+        channelPublishSpy.should.have.been.calledWith(connect2sfExchange, failedRoutingKey, new Buffer(validMessage.content));
       };
       invokeConsume(done);
     });

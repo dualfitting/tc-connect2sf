@@ -81,7 +81,7 @@ export async function consume(channel, exchangeName, queue, publishChannel) {
           channel.ack(msg);
           try {
             publishChannel.publish(
-              exchangeName,
+              config.rabbitmq.connect2sfExchange,
               key + EVENT.ROUTING_KEY.FAILED_SUFFIX,
               new Buffer(msg.content.toString())
             );
