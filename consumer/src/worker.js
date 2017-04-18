@@ -105,12 +105,21 @@ async function start() {
     connection = await amqp.connect(config.rabbitmqURL);
     debug('created connection successfully with URL: ' + config.rabbitmqURL);
     const channel = await connection.createConfirmChannel();
-    debug('Channel confirmed...');
+    debug('Channel created for projects exchange ...');
     const publishChannel = await connection.createConfirmChannel();
+    debug('Channel created for publishing failed messages ...');
     consume(
       channel,
       config.rabbitmq.projectsExchange,
       config.rabbitmq.queues.project,
+      publishChannel
+    );
+    const connect2sfChannel = await connection.createConfirmChannel();
+    debug('Channel created for consuming failed messages ...');
+    consume(
+      connect2sfChannel,
+      config.rabbitmq.connect2sfExchange,
+      config.rabbitmq.queues.connect2sf,
       publishChannel
     );
   } catch (e) {
