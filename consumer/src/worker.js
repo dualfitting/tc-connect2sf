@@ -82,7 +82,7 @@ export async function consume(channel, exchangeName, queue, publishChannel) {
           try {
             publishChannel.publish(
               exchangeName,
-              EVENT.ROUTING_KEY.CONNECT_TO_SF_FAILED,
+              key + EVENT.ROUTING_KEY.FAILED_SUFFIX,
               new Buffer(msg.content.toString())
             );
           } catch(e) {

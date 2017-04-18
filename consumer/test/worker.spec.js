@@ -105,7 +105,8 @@ describe('worker', () => {
       rabbitConsume = async (queue, fn) => {
         await fn(validMessage);
         ack.should.have.been.calledWith(validMessage);
-        channelPublishSpy.should.have.been.calledWith(exchangeName, EVENT.ROUTING_KEY.CONNECT_TO_SF_FAILED, new Buffer(validMessage.content));
+        const failedRoutingKey = validMessage.fields.routingKey + EVENT.ROUTING_KEY.FAILED_SUFFIX;
+        channelPublishSpy.should.have.been.calledWith(exchangeName, failedRoutingKey, new Buffer(validMessage.content));
       };
       invokeConsume(done);
     });

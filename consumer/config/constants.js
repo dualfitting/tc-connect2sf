@@ -4,6 +4,6 @@ export const EVENT = {
     PROJECT_DRAFT_CREATED: 'project.draft-created',
     PROJECT_UPDATED: 'project.updated',
     PROJECT_DELETED: 'project.deleted',
-    CONNECT_TO_SF_FAILED: 'connect2sf.failed'
+    FAILED_SUFFIX: '.failed'
   },
 };
