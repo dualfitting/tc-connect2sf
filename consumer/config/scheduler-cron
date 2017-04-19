@@ -1,1 +1,1 @@
-*/5 * * * * babel-node ../src/scheduled-worker.js
+*/5 * * * * babel-node /usr/src/app/src/scheduled-worker.js
