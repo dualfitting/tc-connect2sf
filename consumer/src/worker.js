@@ -82,7 +82,8 @@ export async function consume(channel, exchangeName, queue, publishChannel) {
           try {
             publishChannel.publish(
               config.rabbitmq.connect2sfExchange,
-              key + EVENT.ROUTING_KEY.FAILED_SUFFIX,
+              // key + EVENT.ROUTING_KEY.FAILED_SUFFIX,
+              key,
               new Buffer(msg.content.toString())
             );
           } catch(e) {
