@@ -90,9 +90,10 @@ describe('worker', () => {
 
     it('should ack a message with invalid JSON', (done) => {
       rabbitConsume = async (queue, fn) => {
-        const msg = { content: 'foo' };
+        const msg = { content: 'foo', fields: { routingKey : exchangeName } };
         await fn(msg);
         ack.should.have.been.calledWith(msg);
+        nack.should.not.have.been.called;
       };
       invokeConsume(done);
     });

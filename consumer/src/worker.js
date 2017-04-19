@@ -114,14 +114,6 @@ async function start() {
       config.rabbitmq.queues.project,
       publishChannel
     );
-    const connect2sfChannel = await connection.createConfirmChannel();
-    debug('Channel created for consuming failed messages ...');
-    consume(
-      connect2sfChannel,
-      config.rabbitmq.connect2sfExchange,
-      config.rabbitmq.queues.connect2sf,
-      publishChannel
-    );
   } catch (e) {
     debug('Unable to connect to RabbitMQ');
   }

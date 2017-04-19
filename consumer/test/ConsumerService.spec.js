@@ -95,8 +95,14 @@ describe('ConsumerService', () => {
         id: 1,
         members: [],
       };
-      await expect(ConsumerService.processProjectCreated(logger, projectWihoutMembers))
-        .to.be.rejectedWith(UnprocessableError, /Cannot find primary customer/);
+      try {
+        ConsumerService.processProjectCreated(logger, projectWihoutMembers);
+        sinon.fail('Should be rejected');
+      } catch(err) {
+        expect(err).to.exist
+          .and.be.instanceof(UnprocessableError)
+          .and.have.property('message').and.match(/Cannot find primary customer/);
+      }
     });
 
     it('should throw UnprocessableError if Lead already exists', async() => {
@@ -108,7 +114,7 @@ describe('ConsumerService', () => {
         };
         throw err;
       });
-      await expect(ConsumerService.processProjectCreated(logger,project))
+      return expect(ConsumerService.processProjectCreated(logger,project))
         .to.be.rejectedWith(UnprocessableError, /Lead already existing for project 1/);
       createObjectStub.should.have.been.called;
     });

@@ -17,8 +17,10 @@ RUN npm install
 
 RUN npm install -g forever
 
+RUN crontab config/scheduler-cron
+
+RUN cron
+
 EXPOSE 80
 
 CMD forever -c "npm start" --uid "consumer"  .
-
-#CMD npm start
