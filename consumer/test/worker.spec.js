@@ -108,7 +108,7 @@ describe('worker', () => {
         await fn(validMessage);
         ack.should.have.been.calledWith(validMessage);
         const connect2sfExchange = config.rabbitmq.connect2sfExchange;
-        const failedRoutingKey = validMessage.fields.routingKey + EVENT.ROUTING_KEY.FAILED_SUFFIX;
+        const failedRoutingKey = validMessage.fields.routingKey;// + EVENT.ROUTING_KEY.FAILED_SUFFIX;
         channelPublishSpy.should.have.been.calledWith(connect2sfExchange, failedRoutingKey, new Buffer(validMessage.content));
       };
       invokeConsume(done);
