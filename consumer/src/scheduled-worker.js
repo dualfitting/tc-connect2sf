@@ -22,6 +22,7 @@ let EVENT_HANDLERS = {
 }
 
 function close() {
+  console.log('closing self...')
   try {
     connection.close();
   } catch (ignore) { // eslint-ignore-line
@@ -60,11 +61,11 @@ export function processMessage(channel, msg) {
       logger.info(ignore);
       logger.error('Invalid message. Ignoring');
       channel.ack(msg);
-      reject('Invalid message. Ignoring');
+      reject(new Error('Invalid message. Ignoring'));
     }
     return handler(logger, data).then(() => {
       channel.ack(msg);
-      resolve();
+      resolve(msg);
     })
     .catch((e) => {
       logger.logFullError(e, `Error processing message`);
@@ -74,6 +75,7 @@ export function processMessage(channel, msg) {
         // NACK and requeue (nack requeues by default) the message for next turn
         channel.nack(msg);
       }
+      reject(new Error('Error processing message'));
     });
   })
 }
@@ -119,7 +121,7 @@ async function start() {
               }
             }).catch((e) => {
               counter++;
-              debug('Processed messages = ' + counter);
+              debug('Processed messages[Error] = ' + counter);
               logger.logFullError(e, `Unable to process one of the messages`);
               if (counter >= 10) {
                 close();
