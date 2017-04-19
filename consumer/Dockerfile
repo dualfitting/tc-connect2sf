@@ -17,7 +17,7 @@ COPY . /usr/src/app
 # Install app dependencies
 RUN npm install
 
-RUN npm install -g forever
+RUN npm install -g forever babel-cli
 
 RUN crontab config/scheduler-cron
 
