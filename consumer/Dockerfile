@@ -1,14 +1,11 @@
-FROM ubuntu
+FROM node:6.9.4
 LABEL version="1.0"
 LABEL description="Topcoder Salesforce Integration"
 
+RUN apt-get update && \
+    apt-get upgrade -y
 
-
-RUN apt-get update && apt-get upgrade -y && apt-get install -y cron logrotate curl
-RUN curl -sL https://deb.nodesource.com/setup_6.x | bash -
-RUN apt-get install -y nodejs
-
-RUN apt-get install cron -y
+#RUN apt-get install cron -y
 
 
 # Create app directory
@@ -22,9 +19,9 @@ RUN npm install
 
 RUN npm install -g forever babel-cli
 
-RUN crontab config/scheduler-cron
+#RUN crontab config/scheduler-cron
 
-RUN service cron start
+#RUN service cron start
 
 EXPOSE 80
 

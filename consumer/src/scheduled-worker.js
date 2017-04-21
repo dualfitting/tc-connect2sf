@@ -103,9 +103,9 @@ function assertExchangeQueues(channel, exchangeName, queue) {
 /**
  * Start the worker
  */
-async function start() {
+export async function start() {
   try {
-    console.log(config.rabbitmqURL);
+    console.log("Scheduled Worker Connecting to RabbitMQ: " + config.rabbitmqURL.substr(-5));
     connection = await amqp.connect(config.rabbitmqURL);
     connection.on('error', (e) => {
       logger.logFullError(e, `ERROR IN CONNECTION`);
@@ -149,7 +149,7 @@ async function start() {
             })
           } else {
             counter++;
-            debug('Processed message');
+            debug('Processed Empty message');
             if (counter >= FETCH_LIMIT) {
               close();
             }
@@ -166,5 +166,5 @@ async function start() {
 }
 
 if (!module.parent) {
-  start();
+  start(); 
 }
