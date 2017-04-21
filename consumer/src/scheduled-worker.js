@@ -11,9 +11,17 @@ import { EVENT } from '../config/constants';
 
 const debug = require('debug')('app:worker');
 
+const FETCH_LIMIT = 10;
+
 let connection;
 process.once('SIGINT', () => {
-  close();
+  debug('Received SIGINT...closing connection...')
+  try {
+    connection.close();
+  } catch (ignore) { // eslint-ignore-line
+    logger.logFullError(ignore)
+  }
+  process.exit();
 });
 
 let EVENT_HANDLERS = {
@@ -22,12 +30,12 @@ let EVENT_HANDLERS = {
 }
 
 function close() {
-  console.log('closing self...')
+  console.log('closing self after processing messages...')
   try {
-    connection.close();
+    setTimeout(connection.close.bind(connection), 30000);
   } catch (ignore) { // eslint-ignore-line
+    logger.logFullError(ignore)
   }
-  process.exit();
 }
 
 export function initHandlers(handlers) {
@@ -43,6 +51,7 @@ export function processMessage(channel, msg) {
   return new Promise((resolve, reject) => {
     if (!msg) {
       reject(new Error('Empty message. Ignoring'));
+      return;
     }
     debug(`Consuming message in \n${msg.content}`);
     const key = _.get(msg, 'fields.routingKey');
@@ -54,28 +63,29 @@ export function processMessage(channel, msg) {
       handler = EVENT_HANDLERS[key];
       if (!_.isFunction(handler)) {
         logger.error(`Unknown message type: ${key}, NACKing... `);
-        channel.nack(msg, false, false)
+        reject(new Error(`Unknown message type: ${key}`));
+        return;
       }
       data = JSON.parse(msg.content.toString());
     } catch (ignore) {
       logger.info(ignore);
       logger.error('Invalid message. Ignoring');
-      channel.ack(msg);
-      reject(new Error('Invalid message. Ignoring'));
+      resolve('Invalid message. Ignoring');
+      return;
     }
     return handler(logger, data).then(() => {
-      channel.ack(msg);
       resolve(msg);
+      return;
     })
     .catch((e) => {
-      logger.logFullError(e, `Error processing message`);
+      // logger.logFullError(e, `Error processing message`);
       if (e.shouldAck) {
-        channel.ack(msg);
+        debug("Resolving for Unprocessable Error in handler...");
+        resolve(msg);
       } else {
-        // NACK and requeue (nack requeues by default) the message for next turn
-        channel.nack(msg);
+        debug("Rejecting promise for error in msg processing...")
+        reject(new Error('Error processing message'));
       }
-      reject(new Error('Error processing message'));
     });
   })
 }
@@ -97,9 +107,16 @@ async function start() {
   try {
     console.log(config.rabbitmqURL);
     connection = await amqp.connect(config.rabbitmqURL);
+    connection.on('error', (e) => {
+      logger.logFullError(e, `ERROR IN CONNECTION`);
+    })
+    connection.on('close', () => {
+      debug('Before closing connection...')
+    })
     debug('created connection successfully with URL: ' + config.rabbitmqURL);
     const connect2sfChannel = await connection.createConfirmChannel();
     debug('Channel created for consuming failed messages ...');
+    connect2sfChannel.prefetch(FETCH_LIMIT);
     assertExchangeQueues(
       connect2sfChannel,
       config.rabbitmq.connect2sfExchange,
@@ -107,27 +124,38 @@ async function start() {
     ).then(() => {
       debug('Asserted all required exchanges and queues');
       let counter = 0;
-      [1,2,3,4,5,6,7,8,9,10].forEach(() => {
-        return connect2sfChannel.get(config.rabbitmq.queues.connect2sf).then((msg) => {
+      _.range(1, 11).forEach(() => {
+        return connect2sfChannel.get(config.rabbitmq.queues.connect2sf).
+        then((msg) => {
           if (msg) {
-            processMessage(
+            return processMessage(
               connect2sfChannel,
               msg
             ).then((responses) => {
               counter++;
-              debug('Processed messages = ' + counter);
-              if (counter >= 10) {
+              debug('Processed message');
+              connect2sfChannel.ack(msg);
+              if (counter >= FETCH_LIMIT) {
                 close();
               }
             }).catch((e) => {
               counter++;
-              debug('Processed messages[Error] = ' + counter);
+              debug('Processed message with Error');
+              connect2sfChannel.nack(msg);
               logger.logFullError(e, `Unable to process one of the messages`);
-              if (counter >= 10) {
+              if (counter >= FETCH_LIMIT) {
                 close();
               }
             })
+          } else {
+            counter++;
+            debug('Processed message');
+            if (counter >= FETCH_LIMIT) {
+              close();
+            }
           }
+        }).catch(() => {
+          console.log('get failed to consume')
         })
       })
     })
