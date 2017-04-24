@@ -125,7 +125,7 @@ async function start() {
 if (!module.parent) {
   start();
  
-  cron.schedule('*/1 * * * *', function(){
+  cron.schedule(config.scheduledWorkerSchedule, function(){
     scheduleStart();
   });
 }
