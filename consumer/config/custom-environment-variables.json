@@ -21,8 +21,10 @@
   },
   "rabbitmq" : {
     "projectsExchange" : "RABBITMQ_PROJECTS_EXCHANGE",
+    "connect2sfExchange" : "RABBITMQ_CONNECT2SF_EXCHANGE",
     "queues": {
-      "project": "QUEUE_PROJECTS"
+      "project": "QUEUE_PROJECTS",
+      "connect2sf": "QUEUE_CONNECT2SF"
     }
   }
 }

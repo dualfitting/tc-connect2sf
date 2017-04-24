@@ -41,46 +41,44 @@ class ConsumerService {
    * @param {Object} projectEvent the project event
    */
   @logAndValidate(['logger','project'], projectCreatedSchema)
-  //@logAndValidate(['projectEvent'], {projectEvent: projectEventSchema})
-  //async processProjectCreated(projectEvent) {
-  async processProjectCreated(logger, project) {
+  processProjectCreated(logger, project) {
     const member = _.find(project.members, {role: memberRole, isPrimary: true});
     if (!member) {
       throw new UnprocessableError('Cannot find primary customer');
     }
-    const [
-      campaignId,
-      user,
-      {accessToken, instanceUrl},
-    ] = await Promise.all([
+    return Promise.all([
       ConfigurationService.getSalesforceCampaignId(),
       IdentityService.getUser(member.userId),
       SalesforceService.authenticate(),
-    ]);
-
-    const lead = {
-      FirstName: user.firstName,
-      LastName: user.lastName,
-      Email: user.email,
-      LeadSource: leadSource,
-      Company: company,
-      OwnerId: config.ownerId,
-      TC_Connect_Project_Id__c: project.id,
-    };
-    let leadId;
-    try {
-      leadId = await SalesforceService.createObject('Lead', lead, accessToken, instanceUrl);
-    } catch (e) {
-      if (e.response && e.response.text && duplicateRecordRegex.test(e.response.text)) {
-        throw new UnprocessableError(`Lead already existing for project ${project.id}`);
-      }
-      throw e;
-    }
-    const campaignMember = {
-      LeadId: leadId,
-      CampaignId: campaignId,
-    };
-    await SalesforceService.createObject('CampaignMember', campaignMember, accessToken, instanceUrl);
+    ]).then((responses) => {
+      const campaignId = responses[0];
+      const user = responses[1];
+      const { accessToken, instanceUrl } = responses[2];
+      const lead = {
+        FirstName: user.firstName,
+        LastName: user.lastName,
+        Email: user.email,
+        LeadSource: leadSource,
+        Company: company,
+        OwnerId: config.ownerId,
+        TC_Connect_Project_Id__c: project.id,
+      };
+      return SalesforceService.createObject('Lead', lead, accessToken, instanceUrl)
+      .then((leadId) => {
+        const campaignMember = {
+          LeadId: leadId,
+          CampaignId: campaignId,
+        };
+        return SalesforceService.createObject('CampaignMember', campaignMember, accessToken, instanceUrl);
+      }).catch( (e) => {
+        if (e.response && e.response.text && duplicateRecordRegex.test(e.response.text)) {
+          throw new UnprocessableError(`Lead already existing for project ${project.id}`);
+        }
+        throw e;
+      })
+    }).catch((error) => {
+      throw error;
+    });
   }
 
   /**
@@ -88,27 +86,44 @@ class ConsumerService {
    * @param {Object} projectEvent the project
    */
   @logAndValidate(['logger', 'projectEvent'], projectUpdatedSchema)
-  async processProjectUpdated(logger, projectEvent) {
+  processProjectUpdated(logger, projectEvent) {
     logger.debug(projectEvent)
     var project = projectEvent.original;
-    const [
-      campaignId,
-      {accessToken, instanceUrl},
-    ] = await Promise.all([
+    return Promise.all([
       ConfigurationService.getSalesforceCampaignId(),
       SalesforceService.authenticate(),
-    ]);
-    let sql = `SELECT id FROM Lead WHERE TC_Connect_Project_Id__c = '${project.id}'`;
-    const {records: [lead]} = await SalesforceService.query(sql, accessToken, instanceUrl);
-    if (!lead) {
-      throw new UnprocessableError(`Cannot find Lead with TC_Connect_Project_Id__c = '${project.id}'`);
-    }
-    sql = `SELECT id FROM CampaignMember WHERE LeadId = '${lead.Id}' AND CampaignId ='${campaignId}'`;
-    const {records: [member]} = await SalesforceService.query(sql, accessToken, instanceUrl);
-    if (!member) {
-      throw new UnprocessableError(`Cannot find CampaignMember for Lead.TC_Connect_Project_Id__c = '${project.id}'`);
-    }
-    await SalesforceService.deleteObject('CampaignMember', member.Id, accessToken, instanceUrl);
+    ]).then((responses) => {
+      const campaignId = responses[0];
+      const { accessToken, instanceUrl } = responses[1];
+      // queries existing lead for the project
+      let sql = `SELECT id FROM Lead WHERE TC_Connect_Project_Id__c = '${project.id}'`;
+      return SalesforceService.query(sql, accessToken, instanceUrl)
+      .then((response) => {
+        const {records: [lead]} = response;
+        if (!lead) {
+          throw new UnprocessableError(`Cannot find Lead with TC_Connect_Project_Id__c = '${project.id}'`);
+        }
+        sql = `SELECT id FROM CampaignMember WHERE LeadId = '${lead.Id}' AND CampaignId ='${campaignId}'`;
+        return SalesforceService.query(sql, accessToken, instanceUrl)
+        .then((response) => {
+          const {records: [member]} = response;
+          if (!member) {
+            throw new UnprocessableError(`Cannot find CampaignMember for Lead.TC_Connect_Project_Id__c = '${project.id}'`);
+          }
+          return SalesforceService.deleteObject('CampaignMember', member.Id, accessToken, instanceUrl);
+        })
+      })
+      // const {records: [lead]} = await SalesforceService.query(sql, accessToken, instanceUrl);
+      // if (!lead) {
+      //   throw new UnprocessableError(`Cannot find Lead with TC_Connect_Project_Id__c = '${project.id}'`);
+      // }
+      // sql = `SELECT id FROM CampaignMember WHERE LeadId = '${lead.Id}' AND CampaignId ='${campaignId}'`;
+      // const {records: [member]} = await SalesforceService.query(sql, accessToken, instanceUrl);
+      // if (!member) {
+      //   throw new UnprocessableError(`Cannot find CampaignMember for Lead.TC_Connect_Project_Id__c = '${project.id}'`);
+      // }
+      // await SalesforceService.deleteObject('CampaignMember', member.Id, accessToken, instanceUrl);
+    });
   }
 }
 

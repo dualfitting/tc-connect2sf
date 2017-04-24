@@ -5,6 +5,8 @@ LABEL description="Topcoder Salesforce Integration"
 RUN apt-get update && \
     apt-get upgrade -y
 
+#RUN apt-get install cron -y
+
 
 # Create app directory
 RUN mkdir -p /usr/src/app
@@ -15,10 +17,12 @@ COPY . /usr/src/app
 # Install app dependencies
 RUN npm install
 
-RUN npm install -g forever
+RUN npm install -g forever babel-cli
+
+#RUN crontab config/scheduler-cron
+
+#RUN service cron start
 
 EXPOSE 80
 
 CMD forever -c "npm start" --uid "consumer"  .
-
-#CMD npm start

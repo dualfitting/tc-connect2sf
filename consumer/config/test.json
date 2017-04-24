@@ -20,8 +20,10 @@
   },
   "rabbitmq" : {
     "projectsExchange" : "dev.projects",
+    "connect2sfExchange": "dev.tc.connect2sf",
     "queues": {
-      "project": "dev.project.service"
+      "project": "dev.project.service",
+      "connect2sf": "dev.tc.connect2sf.exclusive"
     }
   }
 }

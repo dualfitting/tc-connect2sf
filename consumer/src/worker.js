@@ -8,6 +8,8 @@ import _ from 'lodash';
 import logger from './common/logger';
 import ConsumerService from './services/ConsumerService';
 import { EVENT } from '../config/constants';
+import cron from 'node-cron';
+import { start as scheduleStart } from './scheduled-worker'
 
 const debug = require('debug')('app:worker');
 
@@ -81,8 +83,9 @@ export async function consume(channel, exchangeName, queue, publishChannel) {
           channel.ack(msg);
           try {
             publishChannel.publish(
-              exchangeName,
-              EVENT.ROUTING_KEY.CONNECT_TO_SF_FAILED,
+              config.rabbitmq.connect2sfExchange,
+              // key + EVENT.ROUTING_KEY.FAILED_SUFFIX,
+              key,
               new Buffer(msg.content.toString())
             );
           } catch(e) {
@@ -101,12 +104,13 @@ export async function consume(channel, exchangeName, queue, publishChannel) {
  */
 async function start() {
   try {
-    console.log(config.rabbitmqURL);
+    console.log("Worker Connecting to RabbitMQ: " + config.rabbitmqURL.substr(-5));
     connection = await amqp.connect(config.rabbitmqURL);
     debug('created connection successfully with URL: ' + config.rabbitmqURL);
     const channel = await connection.createConfirmChannel();
-    debug('Channel confirmed...');
+    debug('Channel created for projects exchange ...');
     const publishChannel = await connection.createConfirmChannel();
+    debug('Channel created for publishing failed messages ...');
     consume(
       channel,
       config.rabbitmq.projectsExchange,
@@ -120,4 +124,8 @@ async function start() {
 
 if (!module.parent) {
   start();
+ 
+  cron.schedule('*/1 * * * *', function(){
+    scheduleStart();
+  });
 }

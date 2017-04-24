@@ -4,6 +4,7 @@
 import {consume, initHandlers} from '../src/worker';
 import {UnprocessableError} from '../src/common/errors';
 import { EVENT } from '../config/constants';
+import config from 'config';
 import './setup';
 
 describe('worker', () => {
@@ -89,9 +90,10 @@ describe('worker', () => {
 
     it('should ack a message with invalid JSON', (done) => {
       rabbitConsume = async (queue, fn) => {
-        const msg = { content: 'foo' };
+        const msg = { content: 'foo', fields: { routingKey : exchangeName } };
         await fn(msg);
         ack.should.have.been.calledWith(msg);
+        nack.should.not.have.been.called;
       };
       invokeConsume(done);
     });
@@ -105,7 +107,9 @@ describe('worker', () => {
       rabbitConsume = async (queue, fn) => {
         await fn(validMessage);
         ack.should.have.been.calledWith(validMessage);
-        channelPublishSpy.should.have.been.calledWith(exchangeName, EVENT.ROUTING_KEY.CONNECT_TO_SF_FAILED, new Buffer(validMessage.content));
+        const connect2sfExchange = config.rabbitmq.connect2sfExchange;
+        const failedRoutingKey = validMessage.fields.routingKey;// + EVENT.ROUTING_KEY.FAILED_SUFFIX;
+        channelPublishSpy.should.have.been.calledWith(connect2sfExchange, failedRoutingKey, new Buffer(validMessage.content));
       };
       invokeConsume(done);
     });
