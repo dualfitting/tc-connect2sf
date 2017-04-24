@@ -3,6 +3,7 @@
   "logFile": "LOG_FILE",
   "rabbitmqURL": "RABBITMQ_URL",
   "ownerId": "OWNER_ID",
+  "scheduledWorkerSchedule": "SCHEDULED_WORKER_SCHEDULE",
   "aws": {
     "endpoint": "AWS_ENDPOINT",
     "region": "AWS_REGION",
