@@ -44,6 +44,9 @@ class ConsumerService {
   processProjectCreated(logger, project) {
     const member = _.find(project.members, {role: memberRole, isPrimary: true});
     if (!member) {
+      logger.info('Project Members:');
+      logger.info(project.members);
+      console.log(project.members);
       throw new UnprocessableError('Cannot find primary customer');
     }
     return Promise.all([
