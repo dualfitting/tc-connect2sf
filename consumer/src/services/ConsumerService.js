@@ -44,6 +44,9 @@ class ConsumerService {
   processProjectCreated(logger, project) {
     const member = _.find(project.members, {role: memberRole, isPrimary: true});
     if (!member) {
+      logger.info('Project Members:');
+      logger.info(project.members);
+      console.log(project.members);
       throw new UnprocessableError('Cannot find primary customer');
     }
     return Promise.all([
@@ -113,16 +116,6 @@ class ConsumerService {
           return SalesforceService.deleteObject('CampaignMember', member.Id, accessToken, instanceUrl);
         })
       })
-      // const {records: [lead]} = await SalesforceService.query(sql, accessToken, instanceUrl);
-      // if (!lead) {
-      //   throw new UnprocessableError(`Cannot find Lead with TC_Connect_Project_Id__c = '${project.id}'`);
-      // }
-      // sql = `SELECT id FROM CampaignMember WHERE LeadId = '${lead.Id}' AND CampaignId ='${campaignId}'`;
-      // const {records: [member]} = await SalesforceService.query(sql, accessToken, instanceUrl);
-      // if (!member) {
-      //   throw new UnprocessableError(`Cannot find CampaignMember for Lead.TC_Connect_Project_Id__c = '${project.id}'`);
-      // }
-      // await SalesforceService.deleteObject('CampaignMember', member.Id, accessToken, instanceUrl);
     });
   }
 }
