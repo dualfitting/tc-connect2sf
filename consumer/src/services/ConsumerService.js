@@ -45,10 +45,8 @@ function getUpdatedLeadFieldData(projectUpdated) {
     updatedLead.TC_Connect_Cancel_Reason__c = projectUpdated.cancelReason;
   }
   
-  if (projectUpdated.details && projectUpdated.details.utm) {
-    if (projectUpdated.details.utm.code) {
-      updatedLead.TC_Connect_Ref_Code__c = projectUpdated.details.utm.code;
-    }
+  if (projectUpdated.details) {
+    updatedLead.TC_Connect_Ref_Code__c = _.get(projectUpdated,"details.utm.code", ""); 
   }
 
   return updatedLead;
