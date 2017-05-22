@@ -15,7 +15,7 @@ test:
 
 deployment:
   development:
-    branch: ["dev", "circleci", "test"]
+    branch: ["feature/sfdc-lead-update-phase2","dev", "circleci", "test"]
     commands:
       - ./deploy/eb-deploy.sh tc-connect2sf DEV $CIRCLE_BUILD_NUM
   production:
