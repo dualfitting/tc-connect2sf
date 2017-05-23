@@ -176,6 +176,13 @@ Use following JSON for testing
 ```
 {
     "id": 1,
+    "status": "draft",
+    "details": {
+        "utm": {
+            "code": "123"
+        }
+    },
+    "cancelReason":null,
     "members": [
         {
             "userId": 40135978,
@@ -195,7 +202,13 @@ Use following JSON for testing
     },
     "updated": {
         "id": 1,
-        "status": "active"
+        "status": "active",
+        "cancelReason": "Spam",
+        "details": {
+            "utm": {
+                "code": "123"
+            }
+        }
     }
 }
 ```

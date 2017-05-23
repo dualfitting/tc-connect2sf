@@ -24,6 +24,14 @@ const createObjectSchema = {
   instanceUrl: Joi.string().required(),
 };
 
+const updateObjectSchema = {
+  id: Joi.string().required(),
+  type: Joi.string().required(),
+  params: Joi.object().required(),
+  accessToken: Joi.string().required(),
+  instanceUrl: Joi.string().required(),
+};
+
 const deleteObjectSchema = {
   type: Joi.string().required(),
   id: Joi.string().required(),
@@ -85,6 +93,26 @@ class SalesforceService {
       .end()
       .then((res) => res.body.id);
   }
+
+  /**
+   * Update an existing object
+   * @param {String} type the type name
+   * @param {String} params the object properties
+   * @param {String} accessToken the access token
+   * @param {String} instanceUrl the salesforce instance url
+   * @returns {String} the updated object id
+   */
+  @logAndValidate(['id','type', 'params', 'accessToken', 'instanceUrl'], updateObjectSchema)
+  updateObject(id, type, params, accessToken, instanceUrl) {
+    return request
+      .patch(`${instanceUrl}/services/data/v37.0/sobjects/${type}/${id}`)
+      .set({
+        authorization: `Bearer ${accessToken}`,
+      })
+      .send(params)
+      .end();
+  }
+
 
   /**
    * Run the query statement

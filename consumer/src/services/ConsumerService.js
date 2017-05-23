@@ -34,6 +34,25 @@ const projectUpdatedSchema = Joi.object().keys({
     }).required()
 }).unknown(true);
 
+function getUpdatedLeadFieldData(projectUpdated) {
+  const updatedLead = {};
+
+  if (projectUpdated.status) {
+    updatedLead.TC_Connect_Project_Status__c = projectUpdated.status;
+  }
+  
+  if (projectUpdated.cancelReason) {
+    updatedLead.TC_Connect_Cancel_Reason__c = projectUpdated.cancelReason;
+  }
+  
+  if (projectUpdated.details) {
+    updatedLead.Ref_Code__c = _.get(projectUpdated,"details.utm.code", ""); 
+  }
+
+  return updatedLead;
+}
+
+
 class ConsumerService {
 
   /**
@@ -65,6 +84,9 @@ class ConsumerService {
         Company: company,
         OwnerId: config.ownerId,
         TC_Connect_Project_Id__c: project.id,
+        TC_Connect_Project_Status__c: _.get(project,"status",""),
+        Ref_Code__c: _.get(project, "details.utm.code",""),
+        TC_Connect_Cancel_Reason__c: _.get(project,"cancelReason","")
       };
       return SalesforceService.createObject('Lead', lead, accessToken, instanceUrl)
       .then((leadId) => {
@@ -84,6 +106,7 @@ class ConsumerService {
     });
   }
 
+
   /**
    * Handle created/launched project
    * @param {Object} projectEvent the project
@@ -92,29 +115,40 @@ class ConsumerService {
   processProjectUpdated(logger, projectEvent) {
     logger.debug(projectEvent)
     var project = projectEvent.original;
+    var projectUpdated = projectEvent.updated;
+
+
     return Promise.all([
       ConfigurationService.getSalesforceCampaignId(),
       SalesforceService.authenticate(),
     ]).then((responses) => {
       const campaignId = responses[0];
       const { accessToken, instanceUrl } = responses[1];
+
       // queries existing lead for the project
-      let sql = `SELECT id FROM Lead WHERE TC_Connect_Project_Id__c = '${project.id}'`;
+      let sql = `SELECT id,IsConverted FROM Lead WHERE TC_Connect_Project_Id__c = '${project.id}'`;
       return SalesforceService.query(sql, accessToken, instanceUrl)
       .then((response) => {
         const {records: [lead]} = response;
         if (!lead) {
-          throw new UnprocessableError(`Cannot find Lead with TC_Connect_Project_Id__c = '${project.id}'`);
+           throw new UnprocessableError(`Cannot find Lead with TC_Connect_Project_Id__c = '${project.id}'`);
         }
-        sql = `SELECT id FROM CampaignMember WHERE LeadId = '${lead.Id}' AND CampaignId ='${campaignId}'`;
-        return SalesforceService.query(sql, accessToken, instanceUrl)
-        .then((response) => {
-          const {records: [member]} = response;
-          if (!member) {
-            throw new UnprocessableError(`Cannot find CampaignMember for Lead.TC_Connect_Project_Id__c = '${project.id}'`);
-          }
-          return SalesforceService.deleteObject('CampaignMember', member.Id, accessToken, instanceUrl);
-        })
+        
+        const leadUpdate = getUpdatedLeadFieldData(projectUpdated);
+
+        if (lead.IsConverted != true && !_.isEmpty(leadUpdate)) {
+          return SalesforceService.updateObject(lead.Id, 'Lead', leadUpdate, accessToken, instanceUrl);
+        }
+
+        // sql = `SELECT id FROM CampaignMember WHERE LeadId = '${lead.Id}' AND CampaignId ='${campaignId}'`;
+        // return SalesforceService.query(sql, accessToken, instanceUrl)
+        // .then((response) => {
+          // const {records: [member]} = response;
+          // if (!member) {
+          //  throw new UnprocessableError(`Cannot find CampaignMember for Lead.TC_Connect_Project_Id__c = '${project.id}'`);
+          // }
+          // return SalesforceService.deleteObject('CampaignMember', member.Id, accessToken, instanceUrl);
+        // })
       })
     });
   }
