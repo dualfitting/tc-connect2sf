@@ -46,7 +46,7 @@ function getUpdatedLeadFieldData(projectUpdated) {
   }
   
   if (projectUpdated.details) {
-    updatedLead.TC_Connect_Ref_Code__c = _.get(projectUpdated,"details.utm.code", ""); 
+    updatedLead.Ref_Code__c = _.get(projectUpdated,"details.utm.code", ""); 
   }
 
   return updatedLead;
@@ -85,9 +85,8 @@ class ConsumerService {
         OwnerId: config.ownerId,
         TC_Connect_Project_Id__c: project.id,
         TC_Connect_Project_Status__c: _.get(project,"status",""),
-        TC_Connect_Ref_Code__c: _.get(project, "details.utm.code",""),
+        Ref_Code__c: _.get(project, "details.utm.code",""),
         TC_Connect_Cancel_Reason__c: _.get(project,"cancelReason","")
-
       };
       return SalesforceService.createObject('Lead', lead, accessToken, instanceUrl)
       .then((leadId) => {
@@ -118,7 +117,6 @@ class ConsumerService {
     var project = projectEvent.original;
     var projectUpdated = projectEvent.updated;
 
-    var that = this;
 
     return Promise.all([
       ConfigurationService.getSalesforceCampaignId(),
@@ -126,18 +124,19 @@ class ConsumerService {
     ]).then((responses) => {
       const campaignId = responses[0];
       const { accessToken, instanceUrl } = responses[1];
+
       // queries existing lead for the project
-      let sql = `SELECT id FROM Lead WHERE TC_Connect_Project_Id__c = '${project.id}'`;
+      let sql = `SELECT id,IsConverted FROM Lead WHERE TC_Connect_Project_Id__c = '${project.id}'`;
       return SalesforceService.query(sql, accessToken, instanceUrl)
       .then((response) => {
         const {records: [lead]} = response;
         if (!lead) {
-          throw new UnprocessableError(`Cannot find Lead with TC_Connect_Project_Id__c = '${project.id}'`);
+           throw new UnprocessableError(`Cannot find Lead with TC_Connect_Project_Id__c = '${project.id}'`);
         }
         
         const leadUpdate = getUpdatedLeadFieldData(projectUpdated);
 
-        if (!_.isEmpty(leadUpdate)) {
+        if (lead.IsConverted != true && !_.isEmpty(leadUpdate)) {
           return SalesforceService.updateObject(lead.Id, 'Lead', leadUpdate, accessToken, instanceUrl);
         }
 
