@@ -81,7 +81,7 @@ describe('ConsumerService', () => {
         Company: 'Unknown',
         OwnerId: config.ownerId,
         TC_Connect_Project_Id__c: 1,
-        TC_Connect_Ref_Code__c: '123',
+        Ref_Code__c: '123',
         TC_Connect_Project_Status__c: '',
         TC_Connect_Cancel_Reason__c: null
       };
@@ -144,7 +144,7 @@ describe('ConsumerService', () => {
   describe('processProjectUpdated', () => {
     it('should process project successfully', async() => {
       const memberId = 'member-id';
-      const leadSql = `SELECT id FROM Lead WHERE TC_Connect_Project_Id__c = '${project.id}'`;
+      const leadSql = `SELECT id,IsConverted FROM Lead WHERE TC_Connect_Project_Id__c = '${project.id}'`;
       // const memberSql = `SELECT id FROM CampaignMember WHERE LeadId = '${leadId}' AND CampaignId ='${sfCampaignId}'`;
 
       const queryStub = sandbox.stub(SalesforceService, 'query');
