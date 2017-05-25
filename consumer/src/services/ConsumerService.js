@@ -48,6 +48,9 @@ function getUpdatedLeadFieldData(projectUpdated) {
   if (projectUpdated.details) {
     updatedLead.Ref_Code__c = _.get(projectUpdated,"details.utm.code", ""); 
   }
+  if (projectUpdated.directProjectId) {
+    updatedLead.TC_Connect_Direct_Project_Id__c = _.get(projectUpdated, "directProjectId","");
+  }
 
   return updatedLead;
 }
@@ -86,6 +89,7 @@ class ConsumerService {
         TC_Connect_Project_Id__c: project.id,
         TC_Connect_Project_Status__c: _.get(project,"status",""),
         Ref_Code__c: _.get(project, "details.utm.code",""),
+        TC_Connect_Direct_Project_Id__c: _.get(project, "directProjectId",""),
         TC_Connect_Cancel_Reason__c: _.get(project,"cancelReason","")
       };
       return SalesforceService.createObject('Lead', lead, accessToken, instanceUrl)

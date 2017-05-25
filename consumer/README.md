@@ -182,6 +182,7 @@ Use following JSON for testing
             "code": "123"
         }
     },
+    "directProjectId": 5001,
     "cancelReason":null,
     "members": [
         {
@@ -203,6 +204,7 @@ Use following JSON for testing
     "updated": {
         "id": 1,
         "status": "active",
+        "directProjectId": 6001,
         "cancelReason": "Spam",
         "details": {
             "utm": {
