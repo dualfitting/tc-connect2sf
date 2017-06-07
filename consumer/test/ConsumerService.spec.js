@@ -24,8 +24,15 @@ describe('ConsumerService', () => {
     instanceUrl: 'http://fake-domain',
   };
   const userId = 40135978;
+
   const project = {
     id: 1,
+    details: {
+        utm: {
+            code: "123"
+        }
+    },
+    cancelReason: null,
     members: [
       {
         id: 1234,
@@ -42,7 +49,8 @@ describe('ConsumerService', () => {
     },
     updated: {
       id: 1,
-      status: 'active'
+      status: 'active',
+      cancelReason: null
     }
   }
   let sandbox;
@@ -64,6 +72,7 @@ describe('ConsumerService', () => {
 
   describe('processProjectCreated', () => {
     it('should process project successfully', async() => {
+      
       const expectedLead = {
         FirstName: 'john',
         LastName: 'doe',
@@ -72,6 +81,10 @@ describe('ConsumerService', () => {
         Company: 'Unknown',
         OwnerId: config.ownerId,
         TC_Connect_Project_Id__c: 1,
+        Ref_Code__c: '123',
+        TC_Connect_Project_Status__c: '',
+        TC_Connect_Cancel_Reason__c: null,
+        TC_Connect_Direct_Project_Id__c: ''
       };
 
       const expectedCampaignMember = {
@@ -132,21 +145,26 @@ describe('ConsumerService', () => {
   describe('processProjectUpdated', () => {
     it('should process project successfully', async() => {
       const memberId = 'member-id';
-      const leadSql = `SELECT id FROM Lead WHERE TC_Connect_Project_Id__c = '${project.id}'`;
-      const memberSql = `SELECT id FROM CampaignMember WHERE LeadId = '${leadId}' AND CampaignId ='${sfCampaignId}'`;
+      const leadSql = `SELECT id,IsConverted FROM Lead WHERE TC_Connect_Project_Id__c = '${project.id}'`;
+      // const memberSql = `SELECT id FROM CampaignMember WHERE LeadId = '${leadId}' AND CampaignId ='${sfCampaignId}'`;
 
       const queryStub = sandbox.stub(SalesforceService, 'query');
+
+
       queryStub.onCall(0)
         .returns(Promise.resolve({ records: [{ Id: leadId }] }));
-      queryStub.onCall(1)
-        .returns(Promise.resolve({ records: [{ Id: memberId }] }));
-      const deleteObjectStub = sandbox.stub(SalesforceService, 'deleteObject');
+      // queryStub.onCall(1)
+      // .returns(Promise.resolve({ records: [{ Id: memberId }] }));
+      // const deleteObjectStub = sandbox.stub(SalesforceService, 'deleteObject');
+
+      const updateStub = sandbox.stub(SalesforceService,'updateObject', async() => {});
+
 
       await ConsumerService.processProjectUpdated(logger, projectUpdatePaylod);
       queryStub.should.have.been.calledWith(leadSql, sfAuth.accessToken, sfAuth.instanceUrl);
-      queryStub.should.have.been.calledWith(memberSql, sfAuth.accessToken, sfAuth.instanceUrl);
-      deleteObjectStub.should.have.been.calledWith('CampaignMember', memberId, sfAuth.accessToken,
-        sfAuth.instanceUrl);
+      // queryStub.should.have.been.calledWith(memberSql, sfAuth.accessToken, sfAuth.instanceUrl);
+      // deleteObjectStub.should.have.been.calledWith('CampaignMember', memberId, sfAuth.accessToken,
+      // sfAuth.instanceUrl);
     });
 
     it('should throw UnprocessableError if Lead cannot be found', async() => {
@@ -158,7 +176,8 @@ describe('ConsumerService', () => {
       queryStub.should.have.been.called;
     });
 
-    it('should throw UnprocessableError if CampaignMember cannot be found', async() => {
+    // Not a valid use case any more
+    xit('should throw UnprocessableError if CampaignMember cannot be found', async() => {
       const queryStub = sandbox.stub(SalesforceService, 'query');
       queryStub.onCall(0)
         .returns(Promise.resolve({ records: [{ Id: leadId }] }));
