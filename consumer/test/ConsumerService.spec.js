@@ -84,7 +84,8 @@ describe('ConsumerService', () => {
         Ref_Code__c: '123',
         TC_Connect_Project_Status__c: '',
         TC_Connect_Cancel_Reason__c: null,
-        TC_Connect_Direct_Project_Id__c: ''
+        TC_Connect_Direct_Project_Id__c: '',
+        TC_Connect_Description__c:''
       };
 
       const expectedCampaignMember = {
