@@ -45,6 +45,10 @@ function getUpdatedLeadFieldData(projectUpdated) {
     updatedLead.TC_Connect_Cancel_Reason__c = projectUpdated.cancelReason;
   }
   
+  if(projectUpdated.description) {
+    updatedLead.TC_Connect_Description__c = projectUpdated.description;
+  }
+
   if (projectUpdated.details) {
     updatedLead.Ref_Code__c = _.get(projectUpdated,"details.utm.code", ""); 
   }
@@ -87,6 +91,7 @@ class ConsumerService {
         Company: company,
         OwnerId: config.ownerId,
         TC_Connect_Project_Id__c: project.id,
+        TC_Connect_Description__c: _.get(project,"description",""),
         TC_Connect_Project_Status__c: _.get(project,"status",""),
         Ref_Code__c: _.get(project, "details.utm.code",""),
         TC_Connect_Direct_Project_Id__c: _.get(project, "directProjectId",""),
