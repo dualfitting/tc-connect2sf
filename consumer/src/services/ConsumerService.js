@@ -83,6 +83,7 @@ class ConsumerService {
       const campaignId = responses[0];
       const user = responses[1];
       const { accessToken, instanceUrl } = responses[2];
+      console.log(_.get(project, "details.utm"), "UTM")
       const lead = {
         FirstName: user.firstName,
         LastName: user.lastName,
