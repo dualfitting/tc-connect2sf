@@ -95,7 +95,9 @@ class ConsumerService {
         TC_Connect_Project_Status__c: _.get(project,"status",""),
         Ref_Code__c: _.get(project, "details.utm.code",""),
         TC_Connect_Direct_Project_Id__c: _.get(project, "directProjectId",""),
-        TC_Connect_Cancel_Reason__c: _.get(project,"cancelReason","")
+        TC_Connect_Cancel_Reason__c: _.get(project,"cancelReason",""),
+        Google_Analytics_Click_ID__c: _.get(project,"details.utm.google._gclid",""),
+        Google_Analytics_Client_ID__c: _.get(project,"details.utm.google._gacid","")
       };
       return SalesforceService.createObject('Lead', lead, accessToken, instanceUrl)
       .then((leadId) => {
