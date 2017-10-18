@@ -29,7 +29,11 @@ describe('ConsumerService', () => {
     id: 1,
     details: {
         utm: {
-            code: "123"
+            code: "123",
+            google: {
+              _gacid: "1234.5678",
+              _gclid: "5678.1234"
+            }
         }
     },
     cancelReason: null,
@@ -85,7 +89,9 @@ describe('ConsumerService', () => {
         TC_Connect_Project_Status__c: '',
         TC_Connect_Cancel_Reason__c: null,
         TC_Connect_Direct_Project_Id__c: '',
-        TC_Connect_Description__c:''
+        TC_Connect_Description__c:'',
+        Google_Analytics_Click_ID__c:'5678.1234',
+        Google_Analytics_Client_ID__c:'1234.5678'
       };
 
       const expectedCampaignMember = {
