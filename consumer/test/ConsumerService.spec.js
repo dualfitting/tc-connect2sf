@@ -18,6 +18,7 @@ describe('ConsumerService', () => {
     firstName: 'john',
     lastName: 'doe',
     email: 'jd@example.com',
+    handle: 'jdoe'
   };
   const sfAuth = {
     accessToken: 'fake-token',
@@ -84,6 +85,7 @@ describe('ConsumerService', () => {
         LeadSource: 'Connect',
         Company: 'Unknown',
         OwnerId: config.ownerId,
+        TC_Handle__c: 'jdoe',
         TC_Connect_Project_Id__c: 1,
         Ref_Code__c: '123',
         TC_Connect_Project_Status__c: '',
