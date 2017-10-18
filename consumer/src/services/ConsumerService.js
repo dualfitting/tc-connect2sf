@@ -90,6 +90,7 @@ class ConsumerService {
         LeadSource: leadSource,
         Company: company,
         OwnerId: config.ownerId,
+        TC_Handle__c: user.handle,
         TC_Connect_Project_Id__c: project.id,
         TC_Connect_Description__c: _.get(project,"description",""),
         TC_Connect_Project_Status__c: _.get(project,"status",""),
