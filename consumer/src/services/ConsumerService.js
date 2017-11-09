@@ -51,6 +51,10 @@ function getUpdatedLeadFieldData(projectUpdated) {
 
   if (projectUpdated.details) {
     updatedLead.Ref_Code__c = _.get(projectUpdated,"details.utm.code", ""); 
+    updatedLead.TC_Connect_Budget_Type__c = _.get(projectUpdated, "details.appDefinition.budgetType", ""); 
+    updatedLead.TC_Connect_Budget__c = _.get(projectUpdated, "details.appDefinition.budget", ""); 
+    updatedLead.TC_Connect_When_To_Start__c = _.get(projectUpdated, "details.appDefinition.whenToStart", ""); 
+    updatedLead.TC_Connect_Deadline__c = _.get(projectUpdated, "details.appDefinition.deadline", ""); 
   }
   if (projectUpdated.directProjectId) {
     updatedLead.TC_Connect_Direct_Project_Id__c = _.get(projectUpdated, "directProjectId","");
@@ -83,8 +87,6 @@ class ConsumerService {
       const campaignId = responses[0];
       const user = responses[1];
       const { accessToken, instanceUrl } = responses[2];
-      console.log(project, 'project')
-      console.log(_.get(project,"details.appDefinition.budget",""), 'budget')
       const lead = {
         FirstName: user.firstName,
         LastName: user.lastName,
