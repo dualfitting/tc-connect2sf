@@ -84,6 +84,7 @@ class ConsumerService {
       const user = responses[1];
       const { accessToken, instanceUrl } = responses[2];
       console.log(project, 'project')
+      console.log(_.get(project,"details.appDefinition.budget",""), 'budget')
       const lead = {
         FirstName: user.firstName,
         LastName: user.lastName,
