@@ -15,7 +15,7 @@ test:
 
 deployment:
   development:
-    branch: ["dev", "test", "feature/budget-deadline-fields"]
+    branch: ["dev", "test"]
     commands:
       - ./deploy/eb-deploy.sh tc-connect2sf DEV $CIRCLE_BUILD_NUM
   production:
