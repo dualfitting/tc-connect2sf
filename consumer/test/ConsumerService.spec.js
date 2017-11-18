@@ -29,6 +29,12 @@ describe('ConsumerService', () => {
   const project = {
     id: 1,
     details: {
+        appDefinition: {
+          budget: 10000,
+          budgetType: 'guess',
+          whenToStart: 'asap',
+          deadline: '1-2-months'
+        },
         utm: {
             code: "123",
             google: {
@@ -93,7 +99,11 @@ describe('ConsumerService', () => {
         TC_Connect_Direct_Project_Id__c: '',
         TC_Connect_Description__c:'',
         Google_Analytics_Click_ID__c:'5678.1234',
-        Google_Analytics_Client_ID__c:'1234.5678'
+        Google_Analytics_Client_ID__c:'1234.5678',
+        TC_Connect_Budget_Type__c: 'guess',
+        TC_Connect_Budget__c: 10000,
+        TC_Connect_When_To_Start__c: 'asap',
+        TC_Connect_Deadline__c: '1-2-months'
       };
 
       const expectedCampaignMember = {
