@@ -50,11 +50,7 @@ function getUpdatedLeadFieldData(projectUpdated) {
   }
 
   if (projectUpdated.details) {
-    updatedLead.Ref_Code__c = _.get(projectUpdated,"details.utm.code", ""); 
-    updatedLead.TC_Connect_Budget_Type__c = _.get(projectUpdated, "details.appDefinition.budgetType", ""); 
-    updatedLead.TC_Connect_Budget__c = _.get(projectUpdated, "details.appDefinition.budget", ""); 
-    updatedLead.TC_Connect_When_To_Start__c = _.get(projectUpdated, "details.appDefinition.whenToStart", ""); 
-    updatedLead.TC_Connect_Deadline__c = _.get(projectUpdated, "details.appDefinition.deadline", ""); 
+    updatedLead.TC_ConnectDetails__c = _.get(projectUpdated,"details", ""); 
   }
   if (projectUpdated.directProjectId) {
     updatedLead.TC_Connect_Direct_Project_Id__c = _.get(projectUpdated, "directProjectId","");
@@ -98,15 +94,9 @@ class ConsumerService {
         TC_Connect_Project_Id__c: project.id,
         TC_Connect_Description__c: _.get(project,"description",""),
         TC_Connect_Project_Status__c: _.get(project,"status",""),
-        Ref_Code__c: _.get(project, "details.utm.code",""),
         TC_Connect_Direct_Project_Id__c: _.get(project, "directProjectId",""),
         TC_Connect_Cancel_Reason__c: _.get(project,"cancelReason",""),
-        Google_Analytics_Click_ID__c: _.get(project,"details.utm.google._gclid",""),
-        Google_Analytics_Client_ID__c: _.get(project,"details.utm.google._gacid",""),
-        TC_Connect_Budget_Type__c: _.get(project,"details.appDefinition.budgetType",""),
-        TC_Connect_Budget__c: _.get(project,"details.appDefinition.budget",""),
-        TC_Connect_When_To_Start__c: _.get(project,"details.appDefinition.whenToStart",""),
-        TC_Connect_Deadline__c: _.get(project,"details.appDefinition.deadline","")
+        TC_ConnectDetails__c: _.get(project, "details", ""),
       };
       return SalesforceService.createObject('Lead', lead, accessToken, instanceUrl)
       .then((leadId) => {
