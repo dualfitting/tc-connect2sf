@@ -97,7 +97,7 @@ describe('ConsumerService', () => {
         TC_Connect_Cancel_Reason__c: null,
         TC_Connect_Direct_Project_Id__c: '',
         TC_Connect_Description__c:'',
-        TC_ConnectDetails__c: JSON.stringify(project.details)
+        TC_Connect_Raw_Project__c: JSON.stringify(project)
       };
 
       const expectedCampaignMember = {
