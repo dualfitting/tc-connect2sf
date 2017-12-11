@@ -49,12 +49,12 @@ function getUpdatedLeadFieldData(projectUpdated) {
     updatedLead.TC_Connect_Description__c = projectUpdated.description;
   }
 
-  if (projectUpdated.details) {
-    updatedLead.TC_ConnectDetails__c = JSON.stringify(_.get(projectUpdated,"details", ""));
-  }
   if (projectUpdated.directProjectId) {
     updatedLead.TC_Connect_Direct_Project_Id__c = _.get(projectUpdated, "directProjectId","");
   }
+
+  // updates the raw project JSON
+  updatedLead.TC_Connect_Raw_Project__c = JSON.stringify(projectUpdated);
 
   return updatedLead;
 }
@@ -96,7 +96,7 @@ class ConsumerService {
         TC_Connect_Project_Status__c: _.get(project,"status",""),
         TC_Connect_Direct_Project_Id__c: _.get(project, "directProjectId",""),
         TC_Connect_Cancel_Reason__c: _.get(project,"cancelReason",""),
-        TC_ConnectDetails__c: JSON.stringify(_.get(project, "details", "")),
+        TC_Connect_Raw_Project__c: JSON.stringify(project),
       };
       return SalesforceService.createObject('Lead', lead, accessToken, instanceUrl)
       .then((leadId) => {
