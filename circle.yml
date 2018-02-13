@@ -15,7 +15,7 @@ test:
 
 deployment:
   development:
-    branch: ["dev", "feature/configurable-fields-for-connect-data"]
+    branch: dev
     commands:
       - ./deploy/eb-deploy.sh tc-connect2sf DEV $CIRCLE_BUILD_NUM
   production:
