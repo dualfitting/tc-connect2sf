@@ -93,17 +93,11 @@ describe('ConsumerService', () => {
         OwnerId: config.ownerId,
         TC_Handle__c: 'jdoe',
         TC_Connect_Project_Id__c: 1,
-        Ref_Code__c: '123',
         TC_Connect_Project_Status__c: '',
         TC_Connect_Cancel_Reason__c: null,
         TC_Connect_Direct_Project_Id__c: '',
         TC_Connect_Description__c:'',
-        Google_Analytics_Click_ID__c:'5678.1234',
-        Google_Analytics_Client_ID__c:'1234.5678',
-        TC_Connect_Budget_Type__c: 'guess',
-        TC_Connect_Budget__c: 10000,
-        TC_Connect_When_To_Start__c: 'asap',
-        TC_Connect_Deadline__c: '1-2-months'
+        TC_Connect_Raw_Project__c: JSON.stringify(project)
       };
 
       const expectedCampaignMember = {
