@@ -2,12 +2,12 @@ version: 2
 node_env: &node_env
   docker:
     - image: circleci/node:6.14.3-stretch-browsers
-  workding_directory: consumer
+  working_directory: consumer
 
 python_env: &python_env
   docker:
     - image: circleci/python:2.7-stretch-browsers
-  workding_directory: consumer
+  working_directory: consumer
 
 install_awscli: &install_awscli
   name: "Install awscli"
