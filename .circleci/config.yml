@@ -2,10 +2,12 @@ version: 2
 node_env: &node_env
   docker:
     - image: circleci/node:6.14.3-stretch-browsers
+  workding_directory: consumer
 
 python_env: &python_env
   docker:
     - image: circleci/python:2.7-stretch-browsers
+  workding_directory: consumer
 
 install_awscli: &install_awscli
   name: "Install awscli"
@@ -16,12 +18,10 @@ install_awscli: &install_awscli
   
 deploy_steps: &deploy_steps
   - checkout
-  - run: cd consumer
   - attach_workspace:
       at: .
   - run: *install_awscli
   - setup_remote_docker
-  - run: ls
   - run: ./deploy/eb-deploy.sh tc-connect2sf DEV $CIRCLE_BUILD_NUM
 
 jobs:
@@ -29,7 +29,6 @@ jobs:
     <<: *node_env
     steps:
       - checkout
-      - run: cd consumer
       - restore_cache:
           key: node-modules-{{ checksum "package.json" }}
       - run: npm install
